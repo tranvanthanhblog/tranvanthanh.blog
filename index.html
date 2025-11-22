@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Trần Văn Thành Blog</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header id="hero">
+      <video class="responsive-video" autoplay muted loop playsinline>
+        <source src="7179265572276.mp4" type="video/mp4" />
+      </video>
+      <style>
+        .responsive-video {
+          width: 1410px;
+          height: auto;
+          object-fit: cover;
+          display: block;
+          margin: 0 auto;
+        }
+      </style>
+    </header>
+
+    <!-- Overlay bắt buộc đăng nhập -->
+    <div id="loginOverlay" class="overlay hidden">
+      <div class="overlay-card">
+        <h2>Xin chào — Vui lòng đăng nhập bằng tài khoản Google</h2>
+        <p class="muted">
+          Chỉ tài khoản được cấp quyền (admin) mới có thể đăng bài.
+        </p>
+        <button id="btnGoogle" class="btn">Đăng nhập với Google</button>
+        <p class="muted small">
+          Bạn sẽ tự động được trả về trang khi đăng nhập thành công.
+        </p>
+      </div>
+    </div>
+
+    <div class="site-wrap">
+      <nav class="topbar">
+        <div class="brand">My Video Blog</div>
+        <div class="top-actions">
+          <div id="userInfo" class="small muted"></div>
+          <button id="btnLogout" class="btn ghost hidden">Đăng xuất</button>
+        </div>
+      </nav>
+
+      <main class="grid">
+        <!-- LEFT: admin upload panel (chỉ hiện nếu là admin) -->
+        <aside class="card sidebar hidden" id="adminPanel">
+          <h3>Admin — Đăng bài (ảnh)</h3>
+          <label>Tiêu đề</label>
+          <input id="postTitle" type="text" placeholder="Tiêu đề..." />
+          <label>Mô tả</label>
+          <textarea id="postDesc" placeholder="Mô tả ngắn..."></textarea>
+          <label>Upload ảnh (thumbnail / media)</label>
+          <input
+            type="text"
+            id="postMediaURL"
+            placeholder="Dán URL hình ảnh hoặc video vào đây"
+          />
+          <div style="margin-top: 12px; display: flex; gap: 8px">
+            <button id="btnPublish" class="btn">Đăng bài</button>
+            <button id="btnAddAdmin" class="btn ghost">
+              Thêm admin (email)
+            </button>
+          </div>
+          <hr />
+          <div class="small muted">
+            Admins hardcoded trong code: (mở file app.js để chỉnh)
+          </div>
+        </aside>
+
+        <!-- RIGHT: feed -->
+        <section>
+          <div class="card">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <div><strong>Feed</strong></div>
+              <div>
+                <label class="small muted">Sắp xếp</label>
+                <select id="sortSel">
+                  <option value="desc">Mới nhất</option>
+                  <option value="asc">Cũ nhất</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="feed" class="feed"></div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="footer">
+      <small class="muted"
+        >Client-only demo — dữ liệu lưu trên Firebase Realtime Database &
+        Storage.</small
+      >
+    </footer>
+
+    <!-- Firebase compat SDKs (Realtime + Auth + Storage) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+    <!-- DB layer (tách riêng) -->
+    <script src="db.js"></script>
+
+    <!-- App logic -->
+    <script src="app.js"></script>
+  </body>
+</html>
