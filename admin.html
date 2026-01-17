@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <body>
+    <h2>Admin</h2>
+
+    <input id="title" placeholder="Tiêu đề" /><br />
+    <input id="url" placeholder="URL ảnh / video" /><br />
+    <textarea id="desc" placeholder="Mô tả"></textarea><br />
+    <button onclick="publish()">Đăng bài</button>
+
+    <hr />
+    <h3>Danh sách bài</h3>
+    <div id="adminFeed"></div>
+
+    <script src="db.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>
