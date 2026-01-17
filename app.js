@@ -7,25 +7,45 @@ const userInfo = $("userInfo");
 const adminPanel = $("adminPanel");
 const postTitle = $("postTitle");
 const postDesc = $("postDesc");
-const postMediaURL = $("postMediaURL"); // input URL thay cho file
+const postMediaURL = $("postMediaURL");
 const btnPublish = $("btnPublish");
 const btnAddAdmin = $("btnAddAdmin");
 const feed = $("feed");
 const sortSel = $("sortSel");
 const hero = $("hero");
 
-// Tạo Google Auth provider chuẩn
 const provider = new firebase.auth.GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/userinfo.profile");
 provider.addScope("https://www.googleapis.com/auth/userinfo.email");
 
-// Force login: show overlay when not authenticated
+const loginBtn = document.getElementById("loginBtn");
+const adminBtn = document.getElementById("adminBtn");
+
+loginBtn.onclick = () => {
+  auth.signInWithPopup(provider).catch((e) => alert(e.message));
+};
+
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    adminBtn.style.display = "none";
+    return;
+  }
+
+  const emailKey = user.email.replace(/\./g, "_");
+  const snap = await db.ref("admins/" + emailKey).get();
+
+  if (snap.exists()) {
+    adminBtn.style.display = "inline-block";
+  } else {
+    adminBtn.style.display = "none";
+  }
+});
+
 function requireLogin(show) {
   if (show) loginOverlay.classList.remove("hidden");
   else loginOverlay.classList.add("hidden");
 }
 
-// Login bằng popup Google
 btnGoogle.onclick = async () => {
   try {
     await DB.auth.signInWithPopup(provider);
@@ -34,17 +54,15 @@ btnGoogle.onclick = async () => {
   }
 };
 
-// Logout
 btnLogout.onclick = async () => {
   await DB.auth.signOut();
 };
 
-// Auth listener
-DB.auth.onAuthStateChanged(async (user) => {
+DB.auth.onAuthStateChanged((user) => {
   if (!user) {
     userInfo.textContent = "";
     btnLogout.classList.add("hidden");
-    requireLogin(true); // bắt buộc login để xem
+    requireLogin(true);
     adminPanel.classList.add("hidden");
     feed.innerHTML = "";
   } else {
@@ -52,19 +70,16 @@ DB.auth.onAuthStateChanged(async (user) => {
     userInfo.textContent = user.displayName + " (" + user.email + ")";
     btnLogout.classList.remove("hidden");
 
-    // check admin bằng danh sách email hardcoded
     if (DB.isAdminEmail(user.email)) {
       adminPanel.classList.remove("hidden");
     } else {
       adminPanel.classList.add("hidden");
     }
 
-    // start feed
     startFeed(sortSel.value);
   }
 });
 
-// Publish handler (dùng URL)
 btnPublish.onclick = async () => {
   const user = DB.currentUser();
   if (!user) return alert("Bạn phải đăng nhập.");
@@ -78,7 +93,7 @@ btnPublish.onclick = async () => {
   btnPublish.disabled = true;
   btnPublish.textContent = "Đang đăng...";
   try {
-    const payload = await DB.publishPost({
+    await DB.publishPost({
       title,
       desc: postDesc.value,
       mediaURL,
@@ -95,19 +110,15 @@ btnPublish.onclick = async () => {
   btnPublish.textContent = "Đăng bài";
 };
 
-// Add admin email runtime
 btnAddAdmin.onclick = () => {
-  const email = prompt("Nhập Gmail cần cấp quyền admin (thêm vào runtime):");
+  const email = prompt("Nhập Gmail cần cấp quyền admin (runtime):");
   if (!email) return;
   DB.addAdminEmail(email);
   alert(
-    "Đã thêm admin (runtime): " +
-      email +
-      "\nĐể lưu lâu dài hãy cài chức năng lưu vào DB."
+    "Đã thêm admin (runtime): " + email + "\nĐể lưu lâu dài hãy thêm vào DB.",
   );
 };
 
-// Feed
 let postUnsub = null;
 function startFeed(order = "desc") {
   if (postUnsub) postUnsub();
@@ -123,10 +134,8 @@ function makePostEl(p) {
   const wrap = document.createElement("div");
   wrap.className = "post";
 
-  // THUMB / MEDIA
   const thumb = document.createElement("div");
   thumb.className = "thumb";
-
   if (p.imageURL) {
     if (p.imageURL.match(/\.(jpeg|jpg|gif|png)$/i)) {
       const img = document.createElement("img");
@@ -159,13 +168,12 @@ function makePostEl(p) {
   const info = document.createElement("div");
   info.className = "small muted";
   info.textContent = `Đăng bởi ${p.author?.name || "Unknown"} • ${new Date(
-    p.createdAt
+    p.createdAt,
   ).toLocaleString()}`;
 
   const actions = document.createElement("div");
   actions.className = "actions";
 
-  // LIKE
   const likeBtn = document.createElement("div");
   likeBtn.className = "pill";
   likeBtn.textContent = `❤ ${p.likes || 0}`;
@@ -178,7 +186,6 @@ function makePostEl(p) {
     }
   };
 
-  // SHARE
   const shareBtn = document.createElement("div");
   shareBtn.className = "pill";
   shareBtn.textContent = "Share";
@@ -192,7 +199,6 @@ function makePostEl(p) {
     }
   };
 
-  // COMMENT
   const commentBtn = document.createElement("div");
   commentBtn.className = "pill";
   commentBtn.textContent = "Bình luận";
@@ -203,15 +209,31 @@ function makePostEl(p) {
   actions.appendChild(shareBtn);
   actions.appendChild(commentBtn);
 
+  const cur = DB.currentUser();
+  if (cur && DB.isAdminEmail(cur.email)) {
+    const delPostBtn = document.createElement("button");
+    delPostBtn.className = "btn ghost";
+    delPostBtn.textContent = "Xóa bài";
+    delPostBtn.style.marginLeft = "8px";
+    delPostBtn.onclick = async () => {
+      if (!confirm("Bạn có chắc muốn xóa bài này?")) return;
+      try {
+        await DB.deletePost(p.id);
+        alert("Đã xóa bài!");
+      } catch (e) {
+        alert("Lỗi: " + e.message);
+      }
+    };
+    actions.appendChild(delPostBtn);
+  }
+
   meta.appendChild(title);
   meta.appendChild(desc);
   meta.appendChild(info);
   meta.appendChild(actions);
-
   wrap.appendChild(thumb);
   wrap.appendChild(meta);
 
-  // comments container
   const cmc = document.createElement("div");
   cmc.id = "cmc-" + p.id;
   cmc.style.marginTop = "10px";
@@ -220,7 +242,6 @@ function makePostEl(p) {
   return wrap;
 }
 
-// Toggle comments
 function toggleComments(postId, parentEl) {
   const container = parentEl.querySelector("#cmc-" + postId);
   if (!container) return;
@@ -260,6 +281,7 @@ function toggleComments(postId, parentEl) {
       list.textContent = "Chưa có bình luận.";
       return;
     }
+
     comments.forEach((c) => {
       const div = document.createElement("div");
       div.className = "comment";
@@ -268,9 +290,9 @@ function toggleComments(postId, parentEl) {
       const cb = document.createElement("div");
       cb.style.flex = "1";
       cb.innerHTML = `<strong>${escapeHtml(
-        c.name
+        c.name,
       )}</strong> <div class="small muted">${new Date(
-        c.createdAt
+        c.createdAt,
       ).toLocaleString()}</div><div>${escapeHtml(c.text)}</div>`;
 
       const cur = DB.currentUser();
@@ -301,13 +323,12 @@ function escapeHtml(s) {
   return String(s).replace(
     /[&<>\"']/g,
     (c) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
         c
-      ])
+      ],
   );
 }
 
 sortSel.onchange = () => startFeed(sortSel.value);
 
-// initial: require login overlay until auth fires
 requireLogin(true);
