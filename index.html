@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
   <head>
     <meta charset="utf-8" />
@@ -21,22 +21,32 @@
         }
       </style>
     </header>
+
     <div id="loginOverlay" class="overlay hidden">
       <div class="overlay-card">
         <h2>Vui lòng đăng nhập bằng tài khoản Google</h2>
         <p class="muted">
-          Chào mừng đến với Blog Trần Văn Thành.
+          Chào mừng đến với Blog Trần Văn Thành
         </p>
         <button id="btnGoogle" class="btn">Đăng nhập với Google</button>
         <p class="muted small">
-          Bạn sẽ tự động được trả về trang chủ khi đăng nhập thành công.
+          Đây là trang blog của trường thpt Trần Văn Thành
         </p>
+        <button
+          id="adminBtn"
+          style="display: none"
+          onclick="location.href = 'admin.html'"
+        >
+          ⚙ Admin Panel
+        </button>
+
+        <div id="feed"></div>
       </div>
     </div>
 
     <div class="site-wrap">
       <nav class="topbar">
-        <div class="brand">The Posts</div>
+        <div class="brand">My Video Blog</div>
         <div class="top-actions">
           <div id="userInfo" class="small muted"></div>
           <button id="btnLogout" class="btn ghost hidden">Đăng xuất</button>
@@ -65,7 +75,6 @@
           <hr />
         </aside>
 
-        <!-- RIGHT: feed -->
         <section>
           <div class="card">
             <div
@@ -95,18 +104,13 @@
       <small class="muted">Hiện không có bài đăng nào.</small>
     </footer>
 
-    <!-- Firebase compat SDKs (Realtime + Auth + Storage) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
-    <!-- DB layer (tách riêng) -->
     <script src="db.js"></script>
-
-    <!-- App logic -->
+    <script src="feed.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
-
-
