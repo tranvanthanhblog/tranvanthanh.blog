@@ -1,34 +1,19 @@
-const adminFeed = document.getElementById("adminFeed");
-
-function publish() {
-  const title = document.getElementById("title").value;
-  const imageURL = document.getElementById("url").value;
-  const desc = document.getElementById("desc").value;
-
-  const id = "post_" + Date.now();
-
-  db.ref("posts/" + id).set({
-    id,
-    title,
-    imageURL,
-    desc,
-    createdAt: Date.now(),
-  });
-}
-
-db.ref("posts").on("value", (snap) => {
-  adminFeed.innerHTML = "";
-  const data = snap.val() || {};
-  Object.values(data).forEach((p) => {
-    adminFeed.innerHTML += `
-      <div>
-        ${p.title}
-        <button onclick="del('${p.id}')">❌ Xóa</button>
-      </div>
-    `;
-  });
+DB.auth.onAuthStateChanged((user) => {
+  if (!user || !DB.isAdmin(user.email)) {
+    alert("Không có quyền admin");
+    location.href = "index.html";
+  }
 });
 
-function del(id) {
-  db.ref("posts/" + id).remove();
-}
+btnPublish.onclick = () => {
+  const id = "post_" + Date.now();
+  DB.publish({
+    id,
+    title: title.value,
+    thumb: thumb.value,
+    media: media.value,
+    content: content.value,
+    likes: 0,
+    createdAt: Date.now(),
+  }).then(() => alert("Đã đăng bài"));
+};
