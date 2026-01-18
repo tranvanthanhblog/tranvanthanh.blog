@@ -16,6 +16,7 @@ const db = firebase.database();
 const ADMIN_EMAILS = [
   "tranduonglx2020@gmail.com",
   "tranvanthanhblog@gmail.com",
+  "pvinh1895@gmail.com",
 ];
 
 function isAdmin(email) {
@@ -62,3 +63,4 @@ window.DB = {
   deletePost,
   deleteComment,
 };
+
