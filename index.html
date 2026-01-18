@@ -1,116 +1,42 @@
 <!doctype html>
 <html lang="vi">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Trần Văn Thành Blog</title>
+    <meta charset="UTF-8" />
+    <title>THPT Trần Văn Thành Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link rel="stylesheet" href="styles.css" />
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   </head>
   <body>
-    <header id="hero">
-      <video class="responsive-video" autoplay muted loop playsinline>
-        <source src="7179265572276.mp4" type="video/mp4" />
-      </video>
-      <style>
-        .responsive-video {
-          width: 1410px;
-          height: auto;
-          object-fit: cover;
-          display: block;
-          margin: 0 auto;
-        }
-      </style>
-    </header>
-
     <div id="loginOverlay" class="overlay hidden">
-      <div class="overlay-card">
-        <h2>Vui lòng đăng nhập bằng tài khoản Google</h2>
-        <p class="muted">
-          Chào mừng đến với Blog Trần Văn Thành
-        </p>
-        <button id="btnGoogle" class="btn">Đăng nhập với Google</button>
-        <p class="muted small">
-          Đây là trang blog của trường thpt Trần Văn Thành
-        </p>
-        <button
-          id="adminBtn"
-          style="display: none"
-          onclick="location.href = 'admin.html'"
-        >
-          ⚙ Admin Panel
-        </button>
-
-        <div id="feed"></div>
+      <div class="login-box">
+        <h2>Đăng nhập</h2>
+        <p>Chào mừng đến với THPT Trần Văn Thành blog</p>
+        <button id="btnGoogle" class="btn full">Đăng nhập Google</button>
       </div>
     </div>
 
-    <div class="site-wrap">
-      <nav class="topbar">
-        <div class="brand">My Video Blog</div>
-        <div class="top-actions">
-          <div id="userInfo" class="small muted"></div>
-          <button id="btnLogout" class="btn ghost hidden">Đăng xuất</button>
-        </div>
-      </nav>
+    <header class="hero">
+      <video autoplay muted loop playsinline>
+        <source src="7179265572276.mp4" type="video/mp4" />
+      </video>
+    </header>
 
-      <main class="grid">
-        <aside class="card sidebar hidden" id="adminPanel">
-          <h3>Admin — Đăng bài (ảnh)</h3>
-          <label>Tiêu đề</label>
-          <input id="postTitle" type="text" placeholder="Tiêu đề..." />
-          <label>Mô tả</label>
-          <textarea id="postDesc" placeholder="Mô tả ngắn..."></textarea>
-          <label>Upload ảnh (thumbnail / media)</label>
-          <input
-            type="text"
-            id="postMediaURL"
-            placeholder="Dán URL hình ảnh hoặc video vào đây"
-          />
-          <div style="margin-top: 12px; display: flex; gap: 8px">
-            <button id="btnPublish" class="btn">Đăng bài</button>
-            <button id="btnAddAdmin" class="btn ghost">
-              Thêm admin (email)
-            </button>
-          </div>
-          <hr />
-        </aside>
-
-        <section>
-          <div class="card">
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-              "
-            >
-              <div><strong>Feed</strong></div>
-              <div>
-                <label class="small muted">Sắp xếp</label>
-                <select id="sortSel">
-                  <option value="desc">Mới nhất</option>
-                  <option value="asc">Cũ nhất</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div id="feed" class="feed"></div>
-        </section>
-      </main>
+    <div class="topbar">
+      <div id="userInfo"></div>
+      <div class="top-actions">
+        <button id="btnAdmin" class="btn ghost hidden">Admin</button>
+        <button id="btnLogout" class="btn ghost hidden">Đăng xuất</button>
+      </div>
     </div>
 
-    <footer class="footer">
-      <small class="muted">Hiện không có bài đăng nào.</small>
-    </footer>
-
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+    <main id="feed" class="feed"></main>
 
     <script src="db.js"></script>
-    <script src="feed.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
