@@ -1,91 +1,108 @@
-const $ = (id) => document.getElementById(id);
-const provider = new firebase.auth.GoogleAuthProvider();
+const feed = document.getElementById("feed");
+const loginOverlay = document.getElementById("loginOverlay");
+const btnGoogle = document.getElementById("btnGoogle");
+const btnLogout = document.getElementById("btnLogout");
+const btnAdmin = document.getElementById("btnAdmin");
+const userInfo = document.getElementById("userInfo");
 
-$("btnGoogle").onclick = () => {
+let currentUser = null;
+
+// ĐĂNG NHẬP GOOGLE
+btnGoogle.onclick = () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
   DB.auth.signInWithPopup(provider);
 };
 
-$("btnLogout").onclick = () => {
+// ĐĂNG XUẤT
+btnLogout.onclick = () => {
   DB.auth.signOut();
 };
 
+// THEO DÕI TRẠNG THÁI ĐĂNG NHẬP
 DB.auth.onAuthStateChanged((user) => {
-  if (!user) {
-    $("loginOverlay").classList.remove("hidden");
-    $("btnLogout").classList.add("hidden");
-    $("btnAdmin").classList.add("hidden");
-    $("userInfo").textContent = "";
-    return;
-  }
+  currentUser = user;
 
-  // Đã đăng nhập
-  $("loginOverlay").classList.add("hidden");
-  $("btnLogout").classList.remove("hidden");
-  $("userInfo").textContent = user.displayName;
+  if (user) {
+    loginOverlay.classList.add("hidden");
+    btnLogout.classList.remove("hidden");
 
-  // CHECK ADMIN
-  if (DB.isAdmin(user.email)) {
-    $("btnAdmin").classList.remove("hidden");
-    $("btnAdmin").onclick = () => location.href = "admin.html";
+    userInfo.textContent = "👋 " + user.displayName;
+
+    // NẾU LÀ ADMIN → HIỆN NÚT ĐĂNG BÀI
+    if (DB.isAdmin(user)) {
+      btnAdmin.classList.remove("hidden");
+      btnAdmin.onclick = () => {
+        location.href = "admin.html";
+      };
+    } else {
+      btnAdmin.classList.add("hidden");
+    }
   } else {
-    $("btnAdmin").classList.add("hidden");
+    loginOverlay.classList.remove("hidden");
+    btnLogout.classList.add("hidden");
+    btnAdmin.classList.add("hidden");
+    userInfo.textContent = "";
   }
 
-  loadFeed(user);
+  loadPosts();
 });
 
 // LOAD BÀI VIẾT
-function loadFeed(user) {
+function loadPosts() {
   DB.onPosts((posts) => {
-    const feed = $("feed");
     feed.innerHTML = "";
 
-    posts.forEach((p) => {
-      const liked = p.likes && p.likes[user.uid];
-      const likeCount = p.likes ? Object.keys(p.likes).length : 0;
+    posts.forEach((post) => {
+      const likeCount = post.likes ? Object.keys(post.likes).length : 0;
+      const img = post.media || post.thumb || "";
 
       const div = document.createElement("div");
       div.className = "post";
 
       div.innerHTML = `
         <div class="thumb">
-          <img src="${p.thumb || ""}">
+          ${img ? `<img src="${img}">` : ""}
         </div>
-        <div class="info">
-          <h3>${p.title}</h3>
+        <div class="post-info">
+          <h3>${post.title}</h3>
           <div class="actions">
-            <span class="pill" id="like-${p.id}">❤️ ${likeCount}</span>
-            <span class="pill" id="view-${p.id}">Xem</span>
+            <button class="pill like-btn">❤️ ${likeCount}</button>
+            <button class="pill view-btn">Xem</button>
             ${
-              DB.isAdmin(user.email)
-                ? `<span class="pill danger" id="del-${p.id}">Xóa</span>`
+              currentUser && DB.isAdmin(currentUser)
+                ? `<button class="pill danger delete-btn">Xóa</button>`
                 : ""
             }
           </div>
         </div>
       `;
 
-      feed.appendChild(div);
-
       // LIKE
-      div.querySelector(`#like-${p.id}`).onclick = () => {
-        DB.toggleLike(p.id, user.uid);
+      div.querySelector(".like-btn").onclick = () => {
+        if (!currentUser) {
+          alert("Đăng nhập để tim bài viết");
+          return;
+        }
+        DB.like(post.id, currentUser.uid);
       };
 
-      // XEM BÀI
-      div.querySelector(`#view-${p.id}`).onclick = () => {
-        localStorage.setItem("viewPost", p.id);
+      // XEM CHI TIẾT
+      div.querySelector(".view-btn").onclick = () => {
+        localStorage.setItem("viewPost", post.id);
         location.href = "post.html";
       };
 
       // XÓA (ADMIN)
-      if (DB.isAdmin(user.email)) {
-        div.querySelector(`#del-${p.id}`).onclick = () => {
-          if (confirm("Xóa bài viết này?")) {
-            DB.deletePost(p.id);
+      const del = div.querySelector(".delete-btn");
+      if (del) {
+        del.onclick = () => {
+          if (confirm("Xóa bài này?")) {
+            DB.deletePost(post.id);
           }
         };
       }
+
+      feed.appendChild(div);
     });
   });
 }
