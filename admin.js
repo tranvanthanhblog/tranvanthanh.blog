@@ -2,6 +2,7 @@ DB.auth.onAuthStateChanged((user) => {
   if (!user || !DB.isAdmin(user.email)) {
     alert("Không có quyền admin");
     location.href = "index.html";
+    return;
   }
 });
 
