@@ -1,81 +1,83 @@
-const $ = (id) => document.getElementById(id);
-const provider = new firebase.auth.GoogleAuthProvider();
+const postList = document.getElementById("post-list");
 
-$("btnGoogle").onclick = () => DB.auth.signInWithPopup(provider);
-$("btnLogout").onclick = () => DB.auth.signOut();
+let currentUser = null;
 
 DB.auth.onAuthStateChanged((user) => {
-  $("feed").innerHTML = "";
-  $("btnAdmin").classList.add("hidden");
-  $("btnLogout").classList.add("hidden");
-
-  if (!user) {
-    $("loginOverlay").classList.remove("hidden");
-    return;
-  }
-
-  $("loginOverlay").classList.add("hidden");
-  $("btnLogout").classList.remove("hidden");
-  $("userInfo").textContent = "- " + user.displayName;
-
-  if (DB.isAdmin(user.email)) {
-    $("btnAdmin").classList.remove("hidden");
-    $("btnAdmin").onclick = () => (location.href = "admin.html");
-  }
-
-  DB.onPosts(renderPosts);
+  currentUser = user;
+  loadPosts();
 });
 
-// ===== RENDER POSTS =====
-function renderPosts(posts) {
-  const feed = $("feed");
-  feed.innerHTML = "";
+function loadPosts() {
+  DB.onPosts((posts) => {
+    postList.innerHTML = "";
 
-  const isAdmin = DB.isAdmin(DB.auth.currentUser.email);
+    posts.forEach((post) => {
+      const likeCount = post.likes ? Object.keys(post.likes).length : 0;
 
-  posts.forEach((p) => {
-    const div = document.createElement("div");
-    div.className = "post";
+      // LẤY ẢNH ĐÚNG (ảnh trong bài, không phải thumbnail lỗi)
+      const img = post.image || post.thumbnail || "";
 
-    div.innerHTML = `
-      <div class="thumb">
-        <img src="${p.thumb || ""}">
-      </div>
+      const div = document.createElement("div");
+      div.className = "post-item";
 
-      <div class="meta">
-        <h3>${p.title}</h3>
-
-        <div class="actions">
-          <div class="pill" onclick="DB.like('${p.id}')">
-            ❤ ${p.likes || 0}
+      div.innerHTML = `
+        <img src="${img}" class="thumb">
+        <div class="post-info">
+          <h3>${post.title}</h3>
+          <div class="actions">
+            <button class="like-btn">❤️ ${likeCount}</button>
+            <button class="view-btn">Xem</button>
+            ${
+              currentUser && DB.isAdmin(currentUser)
+                ? `<button class="delete-btn">Xóa</button>`
+                : ""
+            }
           </div>
-
-          <div class="pill" onclick="openPost('${p.id}')">
-            Xem
-          </div>
-
-          ${
-            isAdmin
-              ? `<div class="pill danger" onclick="removePost('${p.id}')">❌ Xóa</div>`
-              : ""
-          }
         </div>
-      </div>
-    `;
+      `;
 
-    feed.appendChild(div);
+      // Like
+      div.querySelector(".like-btn").onclick = () => {
+        if (!currentUser) {
+          alert("Đăng nhập để tim bài viết");
+          return;
+        }
+        DB.like(post.id, currentUser.uid);
+      };
+
+      // Xem chi tiết
+      div.querySelector(".view-btn").onclick = () => {
+        openPost(post);
+      };
+
+      // Xóa
+      const del = div.querySelector(".delete-btn");
+      if (del) {
+        del.onclick = () => {
+          if (confirm("Xóa bài này?")) {
+            DB.deletePost(post.id);
+          }
+        };
+      }
+
+      postList.appendChild(div);
+    });
   });
 }
 
-// ===== XEM CHI TIẾT =====
-function openPost(id) {
-  localStorage.setItem("viewPost", id);
-  location.href = "post.html";
-}
+// MỞ BÀI VIẾT CHI TIẾT
+function openPost(post) {
+  const container = document.getElementById("main");
 
-// ===== ADMIN XÓA =====
-function removePost(id) {
-  if (confirm("Admin: Xóa bài này?")) {
-    DB.deletePost(id);
-  }
+  // GIỮ XUỐNG DÒNG ĐÚNG NHƯ LÚC VIẾT
+  const contentHTML = post.content
+    ? post.content.replace(/\n/g, "<br>")
+    : "";
+
+  container.innerHTML = `
+    <button onclick="location.reload()">← Quay lại</button>
+    <h2>${post.title}</h2>
+    <img src="${post.image}" class="full-img">
+    <div class="post-content">${contentHTML}</div>
+  `;
 }
