@@ -6,14 +6,13 @@ DB.auth.onAuthStateChanged((user) => {
 });
 
 btnPublish.onclick = () => {
-  const id = "post_" + Date.now();
   DB.publish({
-    id,
     title: title.value,
     thumb: thumb.value,
     media: media.value,
     content: content.value,
-    likes: 0,
-    createdAt: Date.now(),
-  }).then(() => alert("Đã đăng bài"));
+  }).then(() => {
+    alert("Đã đăng bài thành công");
+    location.href = "index.html";
+  });
 };
