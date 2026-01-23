@@ -1,8 +1,20 @@
 DB.auth.onAuthStateChanged((user) => {
-  if (!user || !DB.isAdmin(user.email)) {
+  // CHƯA ĐĂNG NHẬP
+  if (!user) {
+    alert("Vui lòng đăng nhập trước");
+    location.href = "index.html";
+    return;
+  }
+
+  // KHÔNG PHẢI ADMIN
+  if (!DB.isAdmin(user)) {
     alert("Không có quyền admin");
     location.href = "index.html";
+    return;
   }
+
+  // NẾU ĐÚNG ADMIN → CHO Ở LẠI TRANG
+  console.log("Đã đăng nhập admin:", user.email);
 });
 
 btnPublish.onclick = () => {
