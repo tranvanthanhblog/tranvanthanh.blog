@@ -1,83 +1,91 @@
-const postList = document.getElementById("post-list");
+const $ = (id) => document.getElementById(id);
+const provider = new firebase.auth.GoogleAuthProvider();
 
-let currentUser = null;
+$("btnGoogle").onclick = () => {
+  DB.auth.signInWithPopup(provider);
+};
+
+$("btnLogout").onclick = () => {
+  DB.auth.signOut();
+};
 
 DB.auth.onAuthStateChanged((user) => {
-  currentUser = user;
-  loadPosts();
+  if (!user) {
+    $("loginOverlay").classList.remove("hidden");
+    $("btnLogout").classList.add("hidden");
+    $("btnAdmin").classList.add("hidden");
+    $("userInfo").textContent = "";
+    return;
+  }
+
+  // Đã đăng nhập
+  $("loginOverlay").classList.add("hidden");
+  $("btnLogout").classList.remove("hidden");
+  $("userInfo").textContent = user.displayName;
+
+  // CHECK ADMIN
+  if (DB.isAdmin(user.email)) {
+    $("btnAdmin").classList.remove("hidden");
+    $("btnAdmin").onclick = () => location.href = "admin.html";
+  } else {
+    $("btnAdmin").classList.add("hidden");
+  }
+
+  loadFeed(user);
 });
 
-function loadPosts() {
+// LOAD BÀI VIẾT
+function loadFeed(user) {
   DB.onPosts((posts) => {
-    postList.innerHTML = "";
+    const feed = $("feed");
+    feed.innerHTML = "";
 
-    posts.forEach((post) => {
-      const likeCount = post.likes ? Object.keys(post.likes).length : 0;
-
-      // LẤY ẢNH ĐÚNG (ảnh trong bài, không phải thumbnail lỗi)
-      const img = post.image || post.thumbnail || "";
+    posts.forEach((p) => {
+      const liked = p.likes && p.likes[user.uid];
+      const likeCount = p.likes ? Object.keys(p.likes).length : 0;
 
       const div = document.createElement("div");
-      div.className = "post-item";
+      div.className = "post";
 
       div.innerHTML = `
-        <img src="${img}" class="thumb">
-        <div class="post-info">
-          <h3>${post.title}</h3>
+        <div class="thumb">
+          <img src="${p.thumb || ""}">
+        </div>
+        <div class="info">
+          <h3>${p.title}</h3>
           <div class="actions">
-            <button class="like-btn">❤️ ${likeCount}</button>
-            <button class="view-btn">Xem</button>
+            <span class="pill" id="like-${p.id}">❤️ ${likeCount}</span>
+            <span class="pill" id="view-${p.id}">Xem</span>
             ${
-              currentUser && DB.isAdmin(currentUser)
-                ? `<button class="delete-btn">Xóa</button>`
+              DB.isAdmin(user.email)
+                ? `<span class="pill danger" id="del-${p.id}">Xóa</span>`
                 : ""
             }
           </div>
         </div>
       `;
 
-      // Like
-      div.querySelector(".like-btn").onclick = () => {
-        if (!currentUser) {
-          alert("Đăng nhập để tim bài viết");
-          return;
-        }
-        DB.like(post.id, currentUser.uid);
+      feed.appendChild(div);
+
+      // LIKE
+      div.querySelector(`#like-${p.id}`).onclick = () => {
+        DB.toggleLike(p.id, user.uid);
       };
 
-      // Xem chi tiết
-      div.querySelector(".view-btn").onclick = () => {
-        openPost(post);
+      // XEM BÀI
+      div.querySelector(`#view-${p.id}`).onclick = () => {
+        localStorage.setItem("viewPost", p.id);
+        location.href = "post.html";
       };
 
-      // Xóa
-      const del = div.querySelector(".delete-btn");
-      if (del) {
-        del.onclick = () => {
-          if (confirm("Xóa bài này?")) {
-            DB.deletePost(post.id);
+      // XÓA (ADMIN)
+      if (DB.isAdmin(user.email)) {
+        div.querySelector(`#del-${p.id}`).onclick = () => {
+          if (confirm("Xóa bài viết này?")) {
+            DB.deletePost(p.id);
           }
         };
       }
-
-      postList.appendChild(div);
     });
   });
-}
-
-// MỞ BÀI VIẾT CHI TIẾT
-function openPost(post) {
-  const container = document.getElementById("main");
-
-  // GIỮ XUỐNG DÒNG ĐÚNG NHƯ LÚC VIẾT
-  const contentHTML = post.content
-    ? post.content.replace(/\n/g, "<br>")
-    : "";
-
-  container.innerHTML = `
-    <button onclick="location.reload()">← Quay lại</button>
-    <h2>${post.title}</h2>
-    <img src="${post.image}" class="full-img">
-    <div class="post-content">${contentHTML}</div>
-  `;
 }
