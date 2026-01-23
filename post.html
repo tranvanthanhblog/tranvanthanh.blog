@@ -22,17 +22,21 @@
     </div>
 
     <script src="db.js"></script>
-    <script>
-      const id = localStorage.getItem("viewPost");
+<script>
+  const id = localStorage.getItem("viewPost");
 
-      DB.onPosts((posts) => {
-        const post = posts.find((p) => p.id === id);
-        if (!post) return;
+  DB.onPosts((posts) => {
+    const post = posts.find((p) => p.id === id);
+    if (!post) return;
 
-        document.getElementById("title").textContent = post.title;
-        document.getElementById("thumb").src = post.thumb || "";
-        document.getElementById("content").textContent = post.content;
-      });
-    </script>
+    document.getElementById("title").textContent = post.title;
+    document.getElementById("thumb").src = post.media || post.thumb || "";
+
+    // GIỮ NGUYÊN XUỐNG DÒNG
+    document.getElementById("content").innerText = post.content;
+  });
+</script>
+
   </body>
 </html>
+
