@@ -13,49 +13,53 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// ===== ADMIN LIST =====
 const ADMIN_EMAILS = [
   "tranduonglx2020@gmail.com",
   "tranvanthanhblog@gmail.com",
-  "pvinh1895@gmail.com",
 ];
 
-function isAdmin(email) {
-  return ADMIN_EMAILS.includes(email);
+function isAdmin(user) {
+  return user && ADMIN_EMAILS.includes(user.email);
 }
 
-// ===== PUBLISH POST (ID CHUẨN) =====
-function publish(data) {
-  const id = Date.now().toString();   // CHUẨN HÓA ID
-  return db.ref("posts/" + id).set({
-    id,
-    ...data,
-    createdAt: Date.now(),
-    likes: 0,
+// Đăng bài
+function publish(post) {
+  const id = Date.now();
+  post.likes = {};
+  post.createdAt = Date.now();
+  return db.ref("posts/" + id).set(post);
+}
+
+// Lắng nghe bài viết
+function onPosts(callback) {
+  db.ref("posts").on("value", (snap) => {
+    const data = snap.val() || {};
+    const arr = Object.keys(data).map((id) => ({ id, ...data[id] }));
+    arr.sort((a, b) => b.createdAt - a.createdAt);
+    callback(arr);
   });
 }
 
-// ===== LOAD POSTS =====
-function onPosts(cb) {
-  db.ref("posts").on("value", (s) => {
-    const data = s.val() || {};
-    const posts = Object.values(data).sort(
-      (a, b) => b.createdAt - a.createdAt
-    );
-    cb(posts);
+// ❤️ Like – mỗi tài khoản chỉ được 1 lần (bấm lại là bỏ tim)
+function like(postId, userId) {
+  const ref = db.ref(`posts/${postId}/likes/${userId}`);
+  ref.once("value", (snap) => {
+    if (snap.exists()) {
+      // đã tim → bỏ tim
+      ref.remove();
+    } else {
+      // chưa tim → thêm tim
+      ref.set(true);
+    }
   });
 }
 
-// ===== LIKE =====
-function like(id) {
-  db.ref("posts/" + id + "/likes").transaction((v) => (v || 0) + 1);
-}
-
-// ===== DELETE =====
+// Xóa bài
 function deletePost(id) {
   return db.ref("posts/" + id).remove();
 }
 
+// Xóa comment
 function deleteComment(pid, cid) {
   return db.ref(`posts/${pid}/comments/${cid}`).remove();
 }
