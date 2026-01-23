@@ -1,0 +1,152 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, Arial;
+  background: #fff;
+  color: #111;
+}
+
+.hero video {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .hero video {
+    height: 35vh;
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.login-box {
+  background: #fff;
+  padding: 28px;
+  border-radius: 14px;
+  width: 320px;
+  text-align: center;
+}
+
+.full {
+  width: 100%;
+}
+
+.btn {
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.feed {
+  max-width: 1000px;
+  margin: auto;
+  padding: 16px;
+}
+
+.post {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.thumb {
+  width: 260px;
+  height: 150px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #eee;
+}
+
+.thumb img,
+.thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.pill {
+  background: #f1f3f4;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.pill.danger {
+  background: #ffe5e5;
+  color: #c00;
+  font-weight: 600;
+}
+
+.comment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.comment img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.del-cmt {
+  margin-left: auto;
+  cursor: pointer;
+  color: red;
+}
+
+.admin-wrap {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.admin-wrap input,
+.admin-wrap textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+}
