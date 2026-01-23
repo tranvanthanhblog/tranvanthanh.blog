@@ -16,7 +16,7 @@ DB.auth.onAuthStateChanged((user) => {
 
   $("loginOverlay").classList.add("hidden");
   $("btnLogout").classList.remove("hidden");
-  $("userInfo").textContent = user.displayName;
+  $("userInfo").textContent = "- " + user.displayName;
 
   if (DB.isAdmin(user.email)) {
     $("btnAdmin").classList.remove("hidden");
@@ -26,6 +26,7 @@ DB.auth.onAuthStateChanged((user) => {
   DB.onPosts(renderPosts);
 });
 
+// ===== RENDER POSTS =====
 function renderPosts(posts) {
   const feed = $("feed");
   feed.innerHTML = "";
@@ -37,15 +38,44 @@ function renderPosts(posts) {
     div.className = "post";
 
     div.innerHTML = `
-      <div class="thumb"><img src="${p.thumb}"></div>
+      <div class="thumb">
+        <img src="${p.thumb || ""}">
+      </div>
+
       <div class="meta">
         <h3>${p.title}</h3>
+
         <div class="actions">
-          <div class="pill" onclick="DB.like('${p.id}')">❤ ${p.likes || 0}</div>
-          ${isAdmin ? `<div class="pill danger" onclick="DB.deletePost('${p.id}')">❌ Xóa</div>` : ""}
+          <div class="pill" onclick="DB.like('${p.id}')">
+            ❤ ${p.likes || 0}
+          </div>
+
+          <div class="pill" onclick="openPost('${p.id}')">
+            Xem
+          </div>
+
+          ${
+            isAdmin
+              ? `<div class="pill danger" onclick="removePost('${p.id}')">❌ Xóa</div>`
+              : ""
+          }
         </div>
       </div>
     `;
+
     feed.appendChild(div);
   });
+}
+
+// ===== XEM CHI TIẾT =====
+function openPost(id) {
+  localStorage.setItem("viewPost", id);
+  location.href = "post.html";
+}
+
+// ===== ADMIN XÓA =====
+function removePost(id) {
+  if (confirm("Admin: Xóa bài này?")) {
+    DB.deletePost(id);
+  }
 }
