@@ -7,7 +7,7 @@ DB.auth.onAuthStateChanged((user) => {
   }
 
   // KHÔNG PHẢI ADMIN
-  if (!DB.isAdmin(user)) {
+  if (!DB.isAdminEmail(user.email)) {
     alert("Không có quyền admin");
     location.href = "index.html";
     return;
@@ -28,3 +28,4 @@ btnPublish.onclick = () => {
     location.href = "index.html";
   });
 };
+
