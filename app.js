@@ -26,7 +26,7 @@ DB.auth.onAuthStateChanged((user) => {
     loginOverlay.classList.add("hidden");
     btnLogout.classList.remove("hidden");
 
-    userInfo.textContent = "👋 " + user.displayName;
+    userInfo.textContent = "Xin chào" + user.displayName;
 
     // NẾU LÀ ADMIN → HIỆN NÚT ĐĂNG BÀI
     if (DB.isAdmin(user)) {
@@ -106,3 +106,4 @@ function loadPosts() {
     });
   });
 }
+
