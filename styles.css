@@ -165,3 +165,30 @@ body {
   white-space: normal;
 }
 
+/* ===== COMMENTS ===== */
+
+.comment-box {
+  margin-top: 30px;
+}
+
+.comment-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.comment-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.comment-input button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #1a73e8;
+  color: white;
+}
+
