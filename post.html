@@ -10,28 +10,45 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   </head>
+
   <body>
     <div class="feed">
       <button onclick="history.back()" class="btn ghost">← Quay lại</button>
+
       <h2 id="title"></h2>
-      <img
-        id="thumb"
-        style="width: 100%; max-height: 300px; object-fit: cover"
-      />
-      <p id="content"></p>
+
+      <!-- MEDIA (ảnh hoặc video) -->
+      <div id="mediaBox" class="post-media"></div>
+
+      <!-- CONTENT -->
+      <div id="content" class="post-content"></div>
     </div>
 
     <script src="db.js"></script>
+
     <script>
       const id = localStorage.getItem("viewPost");
+
+      function renderMedia(url) {
+        if (!url) return "";
+
+        if (url.endsWith(".mp4") || url.includes("video")) {
+          return `<video src="${url}" controls></video>`;
+        }
+
+        return `<img src="${url}" />`;
+      }
 
       DB.onPosts((posts) => {
         const post = posts.find((p) => p.id === id);
         if (!post) return;
 
-        document.getElementById("title").textContent = post.title;
-        document.getElementById("thumb").src = post.thumb || "";
-        document.getElementById("content").textContent = post.content;
+        title.textContent = post.title;
+
+        mediaBox.innerHTML = renderMedia(post.media || post.thumb);
+
+        // giữ xuống dòng
+        content.innerHTML = post.content.replace(/\n/g, "<br>");
       });
     </script>
   </body>
