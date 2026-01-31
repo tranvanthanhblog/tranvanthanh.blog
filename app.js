@@ -61,7 +61,14 @@ function loadPosts() {
 
       div.innerHTML = `
         <div class="thumb">
-          ${img ? `<img src="${img}">` : ""}
+          ${
+  img
+    ? img.endsWith(".mp4")
+      ? `<video src="${img}" muted></video>`
+      : `<img src="${img}">`
+    : ""
+}
+
         </div>
         <div class="post-info">
           <h3>${post.title}</h3>
@@ -106,5 +113,6 @@ function loadPosts() {
     });
   });
 }
+
 
 
