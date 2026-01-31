@@ -17,39 +17,112 @@
 
       <h2 id="title"></h2>
 
-      <!-- MEDIA (ảnh hoặc video) -->
+      <!-- MEDIA -->
       <div id="mediaBox" class="post-media"></div>
 
       <!-- CONTENT -->
       <div id="content" class="post-content"></div>
+
+      <!-- COMMENTS -->
+      <div class="comment-box">
+        <h3>Bình luận</h3>
+
+        <div id="commentList"></div>
+
+        <div class="comment-input">
+          <input id="cmtInput" placeholder="Viết bình luận..." />
+          <button id="btnSend">Gửi</button>
+        </div>
+      </div>
     </div>
 
     <script src="db.js"></script>
 
     <script>
       const id = localStorage.getItem("viewPost");
+      let currentUser = null;
 
       function renderMedia(url) {
         if (!url) return "";
 
-        if (url.endsWith(".mp4") || url.includes("video")) {
+        if (url.endsWith(".mp4")) {
           return `<video src="${url}" controls></video>`;
         }
 
         return `<img src="${url}" />`;
       }
 
+      DB.auth.onAuthStateChanged((u) => {
+        currentUser = u;
+      });
+
+      // ===== LOAD POST =====
       DB.onPosts((posts) => {
         const post = posts.find((p) => p.id === id);
         if (!post) return;
 
         title.textContent = post.title;
 
-        mediaBox.innerHTML = renderMedia(post.media || post.thumb);
+        // ❌ bỏ thumb
+        mediaBox.innerHTML = renderMedia(post.media);
 
-        // giữ xuống dòng
         content.innerHTML = post.content.replace(/\n/g, "<br>");
+
+        renderComments(post);
       });
+
+      // ===== COMMENTS =====
+      function renderComments(post) {
+        commentList.innerHTML = "";
+
+        const comments = post.comments || {};
+
+        Object.entries(comments).forEach(([cid, c]) => {
+          const div = document.createElement("div");
+          div.className = "comment";
+
+          div.innerHTML = `
+            <img src="${c.photo}" />
+            <b>${c.name}</b>
+            <span>${c.text}</span>
+            ${
+              currentUser && DB.isAdmin(currentUser)
+                ? `<span class="del-cmt">🗑</span>`
+                : ""
+            }
+          `;
+
+          const del = div.querySelector(".del-cmt");
+          if (del) {
+            del.onclick = () => DB.deleteComment(id, cid);
+          }
+
+          commentList.appendChild(div);
+        });
+      }
+
+      // ===== SEND COMMENT =====
+      btnSend.onclick = () => {
+        if (!currentUser) {
+          alert("Đăng nhập để bình luận");
+          return;
+        }
+
+        if (!cmtInput.value.trim()) return;
+
+        const cid = Date.now();
+
+        firebase
+          .database()
+          .ref(`posts/${id}/comments/${cid}`)
+          .set({
+            text: cmtInput.value,
+            name: currentUser.displayName,
+            photo: currentUser.photoURL,
+          });
+
+        cmtInput.value = "";
+      };
     </script>
   </body>
 </html>
