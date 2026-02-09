@@ -42,15 +42,23 @@
       const id = localStorage.getItem("viewPost");
       let currentUser = null;
 
-      function renderMedia(url) {
-        if (!url) return "";
+     function renderMedia(url) {
+  if (!url) return "";
 
-        if (url.endsWith(".mp4")) {
-          return `<video src="${url}" controls></video>`;
-        }
+  const lower = url.toLowerCase();
 
-        return `<img src="${url}" />`;
-      }
+  if (
+    lower.includes(".mp4") ||
+    lower.includes("video") ||
+    lower.includes("firebase") ||
+    lower.includes("storage")
+  ) {
+    return `<video src="${url}" controls preload="metadata"></video>`;
+  }
+
+  return `<img src="${url}" />`;
+}
+
 
       DB.auth.onAuthStateChanged((u) => {
         currentUser = u;
@@ -126,6 +134,7 @@
     </script>
   </body>
 </html>
+
 
 
 
