@@ -63,8 +63,8 @@
 
         title.textContent = post.title;
 
-        // ❌ bỏ thumb
-        media.innerHTML = renderMedia(post.media);
+        mediaBox.innerHTML = renderMedia(post.media);
+
 
         content.innerHTML = post.content.replace(/\n/g, "<br>");
 
@@ -126,5 +126,6 @@
     </script>
   </body>
 </html>
+
 
 
