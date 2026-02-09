@@ -19,12 +19,15 @@ btnPublish.onclick = () => {
   DB.publish({
     title: title.value,
     thumb: thumb.value,
-    media: media.value,
+    media: media.value.trim(),
     content: content.value,
   }).then(() => {
     alert("Đã đăng bài thành công");
     location.href = "index.html";
   });
 };
+
+};
+
 
 
