@@ -7,7 +7,101 @@ body {
   font-family: system-ui, Arial;
   background: #fff;
   color: #111;
+}* {
+  box-sizing: border-box;
 }
+
+body {
+  margin: 0;
+  font-family: system-ui, Arial;
+  background: #121212;
+  color: #eee;
+}
+
+
+/* ========= BUTTON ========= */
+.btn {
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  opacity: .9;
+}
+
+
+/* ========= ADMIN ========= */
+.admin-wrap {
+  max-width: 700px;
+  margin: 60px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-wrap input,
+.admin-wrap textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #1e1e1e;
+  color: white;
+}
+
+.btn-main {
+  background: #3b82f6;
+  font-weight: bold;
+}
+
+
+/* ========= POST ========= */
+.post-wrap {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 16px;
+}
+
+.post-media video {
+  width: 100%;
+  max-height: 500px;
+  border-radius: 14px;
+  margin: 18px 0;
+}
+
+.post-content {
+  line-height: 1.8;
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+
+/* ========= COMMENT ========= */
+
+.comment-input-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.comment-input-box input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #1e1e1e;
+  color: white;
+}
+
+.comment-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
 
 .hero video {
   width: 100%;
@@ -187,5 +281,6 @@ body {
 }
   color: white;
 }
+
 
 
