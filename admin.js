@@ -25,9 +25,9 @@ btnPublish.onclick = () => {
     alert("Đã đăng bài thành công");
     location.href = "index.html";
   });
-};
 
 };
+
 
 
 
