@@ -1,33 +1,36 @@
-DB.auth.onAuthStateChanged((user) => {
+const title = document.getElementById("title");
+const thumb = document.getElementById("thumb");
+const mediaUrl = document.getElementById("mediaUrl");
+const content = document.getElementById("content");
+const btnPublish = document.getElementById("btnPublish");
 
-  if (!user) {
-    alert("Vui lòng đăng nhập trước");
-    location.href = "index.html";
-    return;
-  }
-
-  if (!DB.isAdminEmail(user.email)) {
-    alert("Không có quyền admin");
-    location.href = "index.html";
-    return;
-  }
-
-  console.log("Đã đăng nhập admin:", user.email);
-});
 
 btnPublish.onclick = () => {
+
+  const thumbLink = thumb.value.trim();
+  const videoLink = mediaUrl.value.trim();
+
+  // ⭐ kiểm tra ảnh
+  if (!thumbLink.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
+    alert("Thumbnail phải là LINK ẢNH (.jpg .png ...)");
+    return;
+  }
+
+  // ⭐ kiểm tra video
+  if (!videoLink.match(/\.mp4/i)) {
+    alert("Media phải là LINK VIDEO .mp4");
+    return;
+  }
+
   DB.publish({
     title: title.value,
-    thumb: thumb.value,
-    media: media.value.trim(),
-    content: content.value,
-  }).then(() => {
-    alert("Đã đăng bài thành công");
+    thumb: thumbLink,
+    media: videoLink,
+    content: content.value
+  })
+  .then(()=>{
+    alert("Đăng thành công!");
     location.href = "index.html";
   });
 
 };
-
-
-
-
