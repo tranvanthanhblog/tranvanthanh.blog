@@ -1,140 +1,95 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Trần Văn Thành Blog</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles.css" />
+<head>
+  <meta charset="UTF-8" />
+  <title>Bài viết</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  </head>
+<body class="dark">
 
-  <body>
-    <div class="feed">
-      <button onclick="history.back()" class="btn ghost">← Quay lại</button>
+  <div class="container">
 
-      <h2 id="title"></h2>
+    <button onclick="history.back()" class="btn">← Quay lại</button>
 
-      <!-- MEDIA -->
-      <div id="media" class="post-media"></div>
+    <h1 id="title"></h1>
 
-      <!-- CONTENT -->
-      <div id="content" class="post-content"></div>
+    <!-- MEDIA -->
+    <div id="media" class="post-media"></div>
 
-      <!-- COMMENTS -->
-      <div class="comment-box">
-        <h3>Bình luận</h3>
+    <!-- CONTENT -->
+    <div id="content" class="post-content"></div>
 
-        <div id="commentList"></div>
+    <!-- COMMENT -->
+    <h2>Bình luận</h2>
 
-        <div class="comment-input">
-          <input id="cmtInput" placeholder="Viết bình luận..." />
-          <button id="btnSend">Gửi</button>
-        </div>
-      </div>
+    <div class="comment-box">
+      <input id="cmtInput" placeholder="Viết bình luận..." />
+      <button id="btnSend">Gửi</button>
     </div>
 
-    <script src="db.js"></script>
+    <div id="commentList"></div>
 
-    <script>
-      const id = localStorage.getItem("viewPost");
-      let currentUser = null;
+  </div>
 
-     function renderMedia(url) {
-  if (!url) return "";
+
+<script src="db.js"></script>
+
+<script>
+const id = localStorage.getItem("viewPost");
+
+const titleEl = document.getElementById("title");
+const mediaBox = document.getElementById("media");
+const contentEl = document.getElementById("content");
+const commentList = document.getElementById("commentList");
+const btnSend = document.getElementById("btnSend");
+const cmtInput = document.getElementById("cmtInput");
+
+
+/* ===== render ảnh / video ===== */
+function renderMedia(url){
+  if(!url) return "";
 
   const lower = url.toLowerCase();
 
-  if (
+  if(
     lower.includes(".mp4") ||
-    lower.includes("video") ||
     lower.includes("firebase") ||
     lower.includes("storage")
-  ) {
-    return `<video src="${url}" controls preload="metadata"></video>`;
+  ){
+    return `<video src="${url}" controls></video>`;
   }
 
-  return `<img src="${url}" />`;
+  return `<img src="${url}"/>`;
 }
 
 
-      DB.auth.onAuthStateChanged((u) => {
-        currentUser = u;
-      });
+/* ===== load post ===== */
+DB.getPost(id).then(post => {
 
-      // ===== LOAD POST =====
-      DB.onPosts((posts) => {
-        const post = posts.find((p) => p.id === id);
-        if (!post) return;
+  titleEl.innerText = post.title;
 
-        title.textContent = post.title;
+  mediaBox.innerHTML = renderMedia(post.media);
 
-        mediaBox.innerHTML = renderMedia(post.media);
+  contentEl.innerHTML =
+    post.content.replace(/\n/g,"<br>");
+
+});
 
 
-        content.innerHTML = post.content.replace(/\n/g, "<br>");
+/* ===== comment ===== */
+btnSend.onclick = () => {
+  if(!cmtInput.value.trim()) return;
 
-        renderComments(post);
-      });
+  const div = document.createElement("div");
+  div.className = "comment-item";
+  div.innerText = cmtInput.value;
 
-      // ===== COMMENTS =====
-      function renderComments(post) {
-        commentList.innerHTML = "";
+  commentList.appendChild(div);
 
-        const comments = post.comments || {};
+  cmtInput.value = "";
+};
+</script>
 
-        Object.entries(comments).forEach(([cid, c]) => {
-          const div = document.createElement("div");
-          div.className = "comment";
-
-          div.innerHTML = `
-            <img src="${c.photo}" />
-            <b>${c.name}</b>
-            <span>${c.text}</span>
-            ${
-              currentUser && DB.isAdmin(currentUser)
-                ? `<span class="del-cmt">🗑</span>`
-                : ""
-            }
-          `;
-
-          const del = div.querySelector(".del-cmt");
-          if (del) {
-            del.onclick = () => DB.deleteComment(id, cid);
-          }
-
-          commentList.appendChild(div);
-        });
-      }
-
-      // ===== SEND COMMENT =====
-      btnSend.onclick = () => {
-        if (!currentUser) {
-          alert("Đăng nhập để bình luận");
-          return;
-        }
-
-        if (!cmtInput.value.trim()) return;
-
-        const cid = Date.now();
-
-        firebase
-          .database()
-          .ref(`posts/${id}/comments/${cid}`)
-          .set({
-            text: cmtInput.value,
-            name: currentUser.displayName,
-            photo: currentUser.photoURL,
-          });
-
-        cmtInput.value = "";
-      };
-    </script>
-  </body>
+</body>
 </html>
-
-
-
-
