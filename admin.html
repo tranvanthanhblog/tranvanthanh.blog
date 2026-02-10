@@ -1,41 +1,35 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Đăng bài</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin đăng bài</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-    <link rel="stylesheet" href="styles.css" />
+<body class="dark">
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  </head>
-  <body>
-    <div class="admin-wrap">
-      <h2>Đăng bài viết</h2>
+<div class="container">
 
-      <input id="title" placeholder="Tiêu đề bài viết" />
-      <input id="media" placeholder="Link ảnh / video nội dung" />
-      <input id="thumb" placeholder="Link ảnh thumbnail" />
-      <textarea
-        id="content"
-        rows="6"
-        placeholder="Nội dung bài viết"
-      ></textarea>
+  <h1>Đăng bài mới</h1>
 
-      <button id="btnPublish" class="btn full">Đăng bài</button>
-      <br /><br />
-      <button onclick="location.href = 'index.html'" class="btn ghost full">
-        ← Về trang chủ
-      </button>
-    </div>
+  <input id="title" placeholder="Tiêu đề" />
 
-    <script src="db.js"></script>
-    <script src="admin.js"></script>
-  </body>
+  <!-- ⭐ CHỈ ẢNH -->
+  <input id="thumb" placeholder="Thumbnail (LINK ẢNH .jpg .png .webp)" />
+
+  <!-- ⭐ CHỈ VIDEO -->
+  <input id="mediaUrl" placeholder="Video (LINK .mp4 / firebase storage)" />
+
+  <textarea id="content" rows="8"
+    placeholder="Nội dung bài viết (xuống dòng thoải mái)">
+  </textarea>
+
+  <button id="btnPublish">Đăng bài</button>
+
+</div>
+
+<script src="db.js"></script>
+<script src="admin.js"></script>
+
+</body>
 </html>
-
-
-
-
