@@ -2,29 +2,27 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin đăng bài</title>
+  <title>Đăng bài viết</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body class="dark">
 
-<div class="container">
+<div class="admin-wrap">
 
-  <h1>Đăng bài mới</h1>
+  <h1>Đăng bài</h1>
 
-  <input id="title" placeholder="Tiêu đề" />
+  <input id="title" placeholder="Tiêu đề bài viết" />
 
-  <!-- ⭐ CHỈ ẢNH -->
-  <input id="thumb" placeholder="Thumbnail (LINK ẢNH .jpg .png .webp)" />
+  <input id="thumb" placeholder="Thumbnail (link ảnh .jpg .png)" />
 
-  <!-- ⭐ CHỈ VIDEO -->
-  <input id="mediaUrl" placeholder="Video (LINK .mp4 / firebase storage)" />
+  <input id="mediaUrl" placeholder="Video (.mp4 / firebase storage)" />
 
   <textarea id="content" rows="8"
-    placeholder="Nội dung bài viết (xuống dòng thoải mái)">
+    placeholder="Nội dung bài viết... (xuống dòng thoải mái)">
   </textarea>
 
-  <button id="btnPublish">Đăng bài</button>
+  <button id="btnPublish" class="btn-main">Đăng bài</button>
 
 </div>
 
