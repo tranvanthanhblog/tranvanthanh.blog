@@ -10,17 +10,7 @@ btnPublish.onclick = () => {
   const thumbLink = thumb.value.trim();
   const videoLink = mediaUrl.value.trim();
 
-  // ⭐ kiểm tra ảnh
-  if (!thumbLink.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
-    alert("Thumbnail phải là LINK ẢNH (.jpg .png ...)");
-    return;
-  }
-
-  // ⭐ kiểm tra video
-  if (!videoLink.match(/\.mp4/i)) {
-    alert("Media phải là LINK VIDEO .mp4");
-    return;
-  }
+  
 
   DB.publish({
     title: title.value,
@@ -34,3 +24,4 @@ btnPublish.onclick = () => {
   });
 
 };
+
