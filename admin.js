@@ -12,10 +12,10 @@ btnPublish.onclick = () => {
 
   
 
-  DB.publish({
+  DB.Publish({
     title: title.value,
     thumb: thumbLink,
-    media: videoLink,
+    mediaUrl: videoLink,
     content: content.value
   })
   .then(()=>{
@@ -24,4 +24,5 @@ btnPublish.onclick = () => {
   });
 
 };
+
 
