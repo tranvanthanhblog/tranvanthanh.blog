@@ -7,18 +7,15 @@ const userInfo = document.getElementById("userInfo");
 
 let currentUser = null;
 
-// ĐĂNG NHẬP GOOGLE
 btnGoogle.onclick = () => {
   const provider = new firebase.auth.GoogleAuthProvider();
   DB.auth.signInWithPopup(provider);
 };
 
-// ĐĂNG XUẤT
 btnLogout.onclick = () => {
   DB.auth.signOut();
 };
 
-// THEO DÕI TRẠNG THÁI ĐĂNG NHẬP
 DB.auth.onAuthStateChanged((user) => {
   currentUser = user;
 
@@ -28,7 +25,6 @@ DB.auth.onAuthStateChanged((user) => {
 
     userInfo.textContent = "Xin chào " + user.displayName;
 
-    // NẾU LÀ ADMIN → HIỆN NÚT ĐĂNG BÀI
     if (DB.isAdmin(user)) {
       btnAdmin.classList.remove("hidden");
       btnAdmin.onclick = () => {
@@ -47,7 +43,6 @@ DB.auth.onAuthStateChanged((user) => {
   loadPosts();
 });
 
-// LOAD BÀI VIẾT
 function loadPosts() {
   DB.onPosts((posts) => {
     feed.innerHTML = "";
@@ -84,7 +79,6 @@ function loadPosts() {
         </div>
       `;
 
-      // LIKE
       div.querySelector(".like-btn").onclick = () => {
         if (!currentUser) {
           alert("Đăng nhập để tim bài viết");
@@ -93,13 +87,11 @@ function loadPosts() {
         DB.like(post.id, currentUser.uid);
       };
 
-      // XEM CHI TIẾT
       div.querySelector(".view-btn").onclick = () => {
         localStorage.setItem("viewPost", post.id);
         location.href = "post.html";
       };
 
-      // XÓA (ADMIN)
       const del = div.querySelector(".delete-btn");
       if (del) {
         del.onclick = () => {
@@ -113,6 +105,7 @@ function loadPosts() {
     });
   });
 }
+
 
 
 
