@@ -44,83 +44,55 @@ const commentList = document.getElementById("commentList");
 const btnSend = document.getElementById("btnSend");
 const cmtInput = document.getElementById("cmtInput");
 
-let currentUser = null;
+let currentUser=null;
 
+DB.auth.onAuthStateChanged(u=> currentUser=u);
 
-/* ===== auth ===== */
-DB.auth.onAuthStateChanged(u => currentUser = u);
-
-
-/* ===== video ===== */
 function renderVideo(url){
-  if(!url) return "";
   return `<video src="${url}" controls></video>`;
 }
 
-
-/* ===== load post ===== */
 DB.getPost(id).then(post=>{
   titleEl.innerText = post.title;
   mediaBox.innerHTML = renderVideo(post.media);
   contentEl.innerHTML = post.content.replace(/\n/g,"<br>");
 });
 
+btnSend.onclick=()=>{
+  if(!currentUser) return alert("Đăng nhập đi");
 
-/* ===== add comment ===== */
-btnSend.onclick = ()=>{
-  if(!currentUser){
-    alert("Đăng nhập để comment");
-    return;
-  }
-
-  if(!cmtInput.value.trim()) return;
-
-  DB.addComment(id, cmtInput.value, currentUser);
-
+  DB.addComment(id,cmtInput.value,currentUser);
   cmtInput.value="";
 };
 
-
-/* ===== render comment ===== */
-DB.getComments(id, (comments)=>{
+DB.getComments(id,(comments)=>{
 
   commentList.innerHTML="";
 
   comments.forEach(c=>{
 
-    const div = document.createElement("div");
-    div.className="comment-item";
+    const item=document.createElement("div");
+    item.className="comment-item";
 
-    // avatar
-    const avatar = document.createElement("img");
-    avatar.src="avatar.jpg";
-    avatar.className="avatar";
+    item.innerHTML=`
+      <img src="avatar.jpg" class="avatar">
+      <span>${c.email}: ${c.text}</span>
+    `;
 
-    // text
-    const text = document.createElement("span");
-    text.innerText = c.email + ": " + c.text;
-
-    div.appendChild(avatar);
-    div.appendChild(text);
-
-    // ⭐ chỉ admin hoặc chủ comment mới xoá
     if(currentUser &&
-      (currentUser.uid === c.uid || DB.isAdminEmail(currentUser.email))
-    ){
-      const del = document.createElement("button");
-      del.innerText="❌";
-      del.className="btn-del";
-      del.onclick = ()=> DB.deleteComment(c.id);
-
-      div.appendChild(del);
+      (currentUser.uid===c.uid || DB.isAdminEmail(currentUser.email))){
+        const del=document.createElement("button");
+        del.innerText="❌";
+        del.className="btn-del";
+        del.onclick=()=>DB.deleteComment(c.id);
+        item.appendChild(del);
     }
 
-    commentList.appendChild(div);
-
+    commentList.appendChild(item);
   });
-
 });
 </script>
 
 </body>
 </html>
+
