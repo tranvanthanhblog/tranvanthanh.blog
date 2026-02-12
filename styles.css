@@ -140,25 +140,22 @@ body {
 
 /* ===== ADMIN ===== */
 .admin-wrap{
-  max-width:700px;
+  max-width:600px;
   margin:60px auto;
   display:flex;
   flex-direction:column;
-  gap:15px;
+  gap:14px;
 }
 
 .admin-wrap input,
 .admin-wrap textarea{
-  padding:12px;
-  border-radius:10px;
+  background:#1e293b;
+  color:#fff;
+  border:none;
 }
 
 .btn-main{
-  padding:12px;
-  border-radius:10px;
-  background:#3b82f6;
-  color:white;
-  font-weight:bold;
+  background:#2563eb;
 }
 
 
@@ -217,3 +214,4 @@ body {
   color:red;
   cursor:pointer;
 }
+
