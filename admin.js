@@ -1,28 +1,37 @@
 const title = document.getElementById("title");
 const thumb = document.getElementById("thumb");
-const mediaUrl = document.getElementById("mediaUrl");
+const video = document.getElementById("video");
 const content = document.getElementById("content");
-const btnPublish = document.getElementById("btnPublish");
+const btn = document.getElementById("btnPost");
 
+function isImage(url){
+  return /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+}
 
-btnPublish.onclick = () => {
+btn.onclick = async ()=>{
 
-  const thumbLink = thumb.value.trim();
-  const videoLink = mediaUrl.value.trim();
+  if(!title.value.trim()){
+    alert("Nhập tiêu đề");
+    return;
+  }
 
-  
+  if(!isImage(thumb.value)){
+    alert("Thumbnail phải là LINK ẢNH (.jpg .png ...)");
+    return;
+  }
 
-  DB.Publish({
+  if(!video.value.includes("http")){
+    alert("Video phải là link mp4/firebase");
+    return;
+  }
+
+  await DB.addPost({
     title: title.value,
-    thumb: thumbLink,
-    mediaUrl: videoLink,
+    thumb: thumb.value,
+    media: video.value,
     content: content.value
-  })
-  .then(()=>{
-    alert("Đăng thành công!");
-    location.href = "index.html";
   });
 
+  alert("Đăng thành công");
+  location.href="index.html";
 };
-
-
