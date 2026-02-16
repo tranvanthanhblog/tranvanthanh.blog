@@ -20,7 +20,15 @@
       <div id="media" class="post-media"></div>
       <div id="content" class="post-content"></div>
     </div>
+    <h3>Bình luận</h3>
 
+    <div id="commentBox" class="comment hidden">
+     <input id="cmtInput" placeholder="Viết bình luận..." />
+     <button id="btnSend" class="btn">Gửi</button>
+    </div>
+    <div id="commentList"></div>
+
+    
     <script src="db.js"></script>
 
     <script>
@@ -53,9 +61,54 @@
 
         content.innerHTML = post.content.replace(/\n/g, "<br>");
       });
+      DB.auth.onAuthStateChanged((user) => {
+    currentUser = user;
+
+    if (user) commentBox.classList.remove("hidden");
+    else commentBox.classList.add("hidden");
+  });
+
+  btnSend.onclick = () => {
+    if (!currentUser) return;
+
+    const text = cmtInput.value.trim();
+    if (!text) return;
+
+    DB.addComment(id, currentUser, text);
+    cmtInput.value = "";
+  };
+
+  DB.onComments(id, (comments) => {
+    commentList.innerHTML = "";
+
+    comments.forEach((c) => {
+      const div = document.createElement("div");
+      div.className = "comment";
+
+      div.innerHTML = `
+        <img src="${c.photo || "https://i.pravatar.cc/40"}">
+        <b>${c.name}</b>
+        <span>${c.text}</span>
+        ${
+          currentUser &&
+          (currentUser.uid === c.uid || DB.isAdmin(currentUser))
+            ? `<span class="del-cmt">❌</span>`
+            : ""
+        }
+      `;
+
+      const del = div.querySelector(".del-cmt");
+      if (del) {
+        del.onclick = () => DB.deleteComment(id, c.id);
+      }
+
+      commentList.appendChild(div);
+    });
+  });
     </script>
   </body>
 </html>
+
 
 
 
