@@ -57,6 +57,27 @@ function deletePost(id) {
 function deleteComment(pid, cid) {
   return db.ref(`posts/${pid}/comments/${cid}`).remove();
 }
+function addComment(postId, user, text) {
+  const id = Date.now();
+
+  return db.ref(`posts/${postId}/comments/${id}`).set({
+    uid: user.uid,
+    name: user.displayName,
+    photo: user.photoURL || "",
+    text,
+    createdAt: Date.now(),
+  });
+}
+
+function onComments(postId, callback) {
+  db.ref(`posts/${postId}/comments`).on("value", (snap) => {
+    const data = snap.val() || {};
+    const arr = Object.keys(data).map((id) => ({ id, ...data[id] }));
+    arr.sort((a, b) => a.createdAt - b.createdAt);
+    callback(arr);
+  });
+}
+
 
 window.DB = {
   auth,
@@ -66,4 +87,8 @@ window.DB = {
   like,
   deletePost,
   deleteComment,
+  addComment,
+  onComments,
 };
+
+
