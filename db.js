@@ -13,9 +13,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-
-/* ================= ADMIN ================= */
-
 const ADMIN_EMAILS = [
   "tranduonglx2020@gmail.com",
   "tranvanthanhblog@gmail.com",
@@ -26,21 +23,11 @@ function isAdmin(user) {
   return user && ADMIN_EMAILS.includes(user.email);
 }
 
-
-/* ================= POST ================= */
-
 function publish(post) {
   const id = Date.now();
-
   post.likes = {};
-  post.comments = {};
   post.createdAt = Date.now();
-
   return db.ref("posts/" + id).set(post);
-}
-
-function getPost(id) {
-  return db.ref("posts/" + id).once("value").then(s => s.val());
 }
 
 function onPosts(callback) {
@@ -52,63 +39,31 @@ function onPosts(callback) {
   });
 }
 
+function like(postId, userId) {
+  const ref = db.ref(`posts/${postId}/likes/${userId}`);
+  ref.once("value", (snap) => {
+    if (snap.exists()) {
+      ref.remove();
+    } else {
+      ref.set(true);
+    }
+  });
+}
+
 function deletePost(id) {
   return db.ref("posts/" + id).remove();
 }
 
-
-/* ================= LIKE ================= */
-
-function like(postId, userId) {
-  const ref = db.ref(`posts/${postId}/likes/${userId}`);
-  ref.once("value", (snap) => {
-    snap.exists() ? ref.remove() : ref.set(true);
-  });
+function deleteComment(pid, cid) {
+  return db.ref(`posts/${pid}/comments/${cid}`).remove();
 }
-
-
-/* ================= COMMENT (NEW) ================= */
-
-function addComment(postId, text, user) {
-  const cid = Date.now();
-
-  return db.ref(`posts/${postId}/comments/${cid}`).set({
-    text,
-    uid: user.uid,
-    email: user.email,
-    createdAt: Date.now()
-  });
-}
-
-function onComments(postId, callback) {
-  db.ref(`posts/${postId}/comments`).on("value", snap => {
-    const data = snap.val() || {};
-    const arr = Object.keys(data).map(id => ({
-      id,
-      ...data[id]
-    }));
-    arr.sort((a,b)=>a.createdAt-b.createdAt);
-    callback(arr);
-  });
-}
-
-function deleteComment(postId, cid) {
-  return db.ref(`posts/${postId}/comments/${cid}`).remove();
-}
-
-
-/* ================= EXPORT ================= */
 
 window.DB = {
   auth,
   isAdmin,
   publish,
-  getPost,
   onPosts,
   like,
   deletePost,
-
-  addComment,
-  onComments,
-  deleteComment
+  deleteComment,
 };
