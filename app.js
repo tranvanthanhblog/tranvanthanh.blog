@@ -49,7 +49,7 @@ function loadPosts() {
 
     posts.forEach((post) => {
       const likeCount = post.likes ? Object.keys(post.likes).length : 0;
-      const img = post.media || post.thumb || "";
+      const thumbUrl = post.thumb || "";
 
       const div = document.createElement("div");
       div.className = "post";
@@ -57,10 +57,8 @@ function loadPosts() {
       div.innerHTML = `
         <div class="thumb">
           ${
-            img
-              ? img.endsWith(".mp4")
-                ? `<video src="${img}" muted></video>`
-                : `<img src="${img}">`
+            thumbUrl
+              ? `<img src="${thumbUrl}">`
               : ""
           }
 
@@ -105,3 +103,4 @@ function loadPosts() {
     });
   });
 }
+
