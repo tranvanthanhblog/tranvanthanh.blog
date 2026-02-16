@@ -29,7 +29,11 @@
       function renderMedia(url) {
         if (!url) return "";
 
-        if (url.endsWith(".mp4") || url.includes("video")) {
+        if (
+          url.endsWith(".mp4") ||
+          url.endsWith(".webm") ||
+          url.includes("video")
+        ) {
           return `<video src="${url}" controls></video>`;
         }
 
@@ -49,3 +53,4 @@
     </script>
   </body>
 </html>
+
