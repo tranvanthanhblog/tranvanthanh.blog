@@ -23,7 +23,7 @@ DB.auth.onAuthStateChanged((user) => {
     loginOverlay.classList.add("hidden");
     btnLogout.classList.remove("hidden");
 
-    userInfo.textContent = "Xin chào " + user.displayName;
+    userInfo.textContent = "Xin chào" + user.displayName;
 
     if (DB.isAdmin(user)) {
       btnAdmin.classList.remove("hidden");
@@ -57,12 +57,12 @@ function loadPosts() {
       div.innerHTML = `
         <div class="thumb">
           ${
-  img
-    ? img.endsWith(".mp4")
-      ? `<video src="${img}" muted></video>`
-      : `<img src="${img}">`
-    : ""
-}
+            img
+              ? img.endsWith(".mp4")
+                ? `<video src="${img}" muted></video>`
+                : `<img src="${img}">`
+              : ""
+          }
 
         </div>
         <div class="post-info">
@@ -105,7 +105,3 @@ function loadPosts() {
     });
   });
 }
-
-
-
-
