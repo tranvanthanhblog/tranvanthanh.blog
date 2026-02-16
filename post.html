@@ -28,14 +28,16 @@
 
       function renderMedia(url) {
         if (!url) return "";
-
         if (url.includes("drive.google.com/file/d/")) {
-          const id = url.split("/d/")[1].split("/")[0];
-          url = `https://drive.google.com/uc?export=download&id=${id}`;
+        const id = url.split("/d/")[1].split("/")[0];
+        url = `https://drive.google.com/uc?export=download&id=${id}`;
+        }
+        if (/\.(jpg|jpeg|png|gif|webp)$/i.test(url)) {
+        return `<img src="${url}" />`;
         }
         return `<video src="${url}" controls style="width:100%"></video>`;
-        return <img src="${url}" />;
-       } 
+      }
+
       DB.onPosts((posts) => {
         const post = posts.find((p) => p.id === id);
         if (!post) return;
@@ -49,6 +51,7 @@
     </script>
   </body>
 </html>
+
 
 
 
