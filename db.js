@@ -63,7 +63,7 @@ function addComment(postId, user, text) {
   return db.ref(`posts/${postId}/comments/${id}`).set({
     uid: user.uid,
     name: user.displayName,
-    photo: user.photoURL || "",
+    photo: user.photoURL || "avatar.jpg",
     text,
     createdAt: Date.now(),
   });
@@ -90,5 +90,6 @@ window.DB = {
   addComment,
   onComments,
 };
+
 
 
