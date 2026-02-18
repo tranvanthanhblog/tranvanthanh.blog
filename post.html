@@ -86,7 +86,7 @@
       div.className = "comment";
 
       div.innerHTML = `
-        <img src="avatar.jpg">
+        <img src="${c.photo || "avatar.jpg"}">
         <b>${c.name}</b>
         <span>${c.text}</span>
         ${
