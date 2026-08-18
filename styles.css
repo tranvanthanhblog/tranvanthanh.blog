@@ -260,7 +260,7 @@ body {
 
 @media (max-width: 600px) {
   .post-media iframe {
-    aspect-ratio: 4/3;
+    aspect-ratio: 1/1;
   }
 }
 
