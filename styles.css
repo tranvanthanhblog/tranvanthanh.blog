@@ -257,6 +257,13 @@ body {
   border-radius: 12px;
 }
 
+
+@media (max-width: 600px) {
+  .post-media iframe {
+    aspect-ratio: 4/3;
+  }
+}
+
 .confirm-overlay {
   position: fixed;
   inset: 0;
