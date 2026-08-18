@@ -78,8 +78,6 @@ function onComments(postId, callback) {
   });
 }
 
-// Hộp thoại xác nhận tùy chỉnh, thay cho confirm() mặc định của trình duyệt.
-// Cách dùng: DB.showConfirm("Xóa bài này?").then((ok) => { if (ok) { ... } });
 function showConfirm(message) {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
