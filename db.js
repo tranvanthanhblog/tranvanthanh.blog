@@ -63,7 +63,7 @@ function addComment(postId, user, text) {
   return db.ref(`posts/${postId}/comments/${id}`).set({
     uid: user.uid,
     name: user.displayName,
-    photo: "avatar.jpg" || "",
+    photo: user.photoURL || "avatar.jpg",
     text,
     createdAt: Date.now(),
   });
@@ -78,6 +78,39 @@ function onComments(postId, callback) {
   });
 }
 
+// Hộp thoại xác nhận tùy chỉnh, thay cho confirm() mặc định của trình duyệt.
+// Cách dùng: DB.showConfirm("Xóa bài này?").then((ok) => { if (ok) { ... } });
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "confirm-overlay";
+    overlay.innerHTML = `
+      <div class="confirm-box">
+        <p class="confirm-title">Thông Báo!</p>
+        <p class="confirm-msg"></p>
+        <div class="confirm-actions">
+          <button class="btn ghost" data-act="cancel">Hủy</button>
+          <button class="btn" data-act="ok">Đồng ý</button>
+        </div>
+      </div>
+    `;
+    overlay.querySelector(".confirm-msg").textContent = message;
+
+    function close(result) {
+      overlay.remove();
+      resolve(result);
+    }
+
+    overlay.querySelector('[data-act="ok"]').onclick = () => close(true);
+    overlay.querySelector('[data-act="cancel"]').onclick = () => close(false);
+    overlay.onclick = (e) => {
+      if (e.target === overlay) close(false);
+    };
+
+    document.body.appendChild(overlay);
+  });
+}
+
 
 window.DB = {
   auth,
@@ -89,12 +122,5 @@ window.DB = {
   deleteComment,
   addComment,
   onComments,
+  showConfirm,
 };
-
-
-
-
-
-
-
-
