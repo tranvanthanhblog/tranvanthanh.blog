@@ -101,7 +101,11 @@
 
       const del = div.querySelector(".del-cmt");
       if (del) {
-        del.onclick = () => DB.deleteComment(id, c.id);
+        del.onclick = () => {
+          DB.showConfirm("Xóa bình luận này?").then((ok) => {
+            if (ok) DB.deleteComment(id, c.id);
+          });
+        };
       }
 
       commentList.appendChild(div);
