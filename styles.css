@@ -258,7 +258,7 @@ body {
 }
 
 
-@media (max-width: 600px) {
+@media (max-width: 500px) {
   .post-media iframe {
     aspect-ratio: 16/9;
   }
