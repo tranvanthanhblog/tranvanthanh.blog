@@ -93,9 +93,9 @@ function loadPosts() {
       const del = div.querySelector(".delete-btn");
       if (del) {
         del.onclick = () => {
-          if (confirm("Xóa bài này?")) {
-            DB.deletePost(post.id);
-          }
+          DB.showConfirm("Xóa bài này?").then((ok) => {
+            if (ok) DB.deletePost(post.id);
+          });
         };
       }
 
@@ -103,5 +103,3 @@ function loadPosts() {
     });
   });
 }
-
-
