@@ -20,6 +20,17 @@
       </div>
     </div>
 
+    <div id="profileOverlay" class="overlay hidden">
+      <div class="login-box">
+        <h2>Thông tin tài khoản</h2>
+        <input id="profileName" placeholder="Tên hiển thị" />
+        <p id="profileEmail" class="profile-email"></p>
+        <button id="btnSaveProfile" class="btn full">Lưu</button>
+        <br /><br />
+        <button id="btnCloseProfile" class="btn ghost full">Đóng</button>
+      </div>
+    </div>
+
     <header class="hero">
       <video autoplay muted loop playsinline>
         <source src="7179265572276.mp4" type="video/mp4" />
@@ -27,7 +38,7 @@
     </header>
 
     <div class="topbar">
-      <div id="userInfo"></div>
+      <button id="userInfo"></button>
       <div class="top-actions">
         <button id="btnAdmin" class="btn ghost hidden">Đăng bài viết</button>
         <button id="btnLogout" class="btn ghost hidden">Đăng xuất</button>
