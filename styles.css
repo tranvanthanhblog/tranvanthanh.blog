@@ -261,6 +261,7 @@ body {
     aspect-ratio: 16/9; 
   }
 }
+
 .confirm-overlay {
   position: fixed;
   inset: 0;
@@ -314,6 +315,23 @@ body {
 }
 
 #userInfo:hover {
+  background: #e4e6e7;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.link-btn {
+  text-decoration: none;
+  color: #1a73e8;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.link-btn:hover {
   background: #e4e6e7;
 }
 
