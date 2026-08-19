@@ -256,9 +256,10 @@ body {
   aspect-ratio: 16/9;
   border-radius: 12px;
 }
+
 @media (max-width: 600px) {
   .post-media iframe {
-    aspect-ratio: 16/9; 
+    aspect-ratio: 16/9;
   }
 }
 
@@ -322,6 +323,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .link-btn {
