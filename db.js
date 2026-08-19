@@ -16,6 +16,7 @@ const db = firebase.database();
 const ADMIN_EMAILS = [
   "tranduonglx2020@gmail.com",
   "tranvanthanhblog@gmail.com",
+  "pvinh1895@gmail.com",
 ];
 
 function isAdmin(user) {
@@ -62,7 +63,8 @@ function addComment(postId, user, text) {
   return db.ref(`posts/${postId}/comments/${id}`).set({
     uid: user.uid,
     name: user.displayName,
-    photo: "avatar.jpg" || "",
+    email: user.email || "",
+    photo: user.photoURL || "avatar.jpg",
     text,
     createdAt: Date.now(),
   });
@@ -76,6 +78,7 @@ function onComments(postId, callback) {
     callback(arr);
   });
 }
+
 
 function showConfirm(message) {
   return new Promise((resolve) => {
