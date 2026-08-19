@@ -5,6 +5,12 @@ const btnLogout = document.getElementById("btnLogout");
 const btnAdmin = document.getElementById("btnAdmin");
 const userInfo = document.getElementById("userInfo");
 
+const profileOverlay = document.getElementById("profileOverlay");
+const profileName = document.getElementById("profileName");
+const profileEmail = document.getElementById("profileEmail");
+const btnSaveProfile = document.getElementById("btnSaveProfile");
+const btnCloseProfile = document.getElementById("btnCloseProfile");
+
 let currentUser = null;
 
 btnGoogle.onclick = () => {
@@ -14,6 +20,37 @@ btnGoogle.onclick = () => {
 
 btnLogout.onclick = () => {
   DB.auth.signOut();
+};
+
+userInfo.onclick = () => {
+  if (!currentUser) return;
+  profileName.value = currentUser.displayName || "";
+  profileEmail.textContent = currentUser.email || "";
+  profileOverlay.classList.remove("hidden");
+};
+
+btnCloseProfile.onclick = () => {
+  profileOverlay.classList.add("hidden");
+};
+
+profileOverlay.onclick = (e) => {
+  if (e.target === profileOverlay) profileOverlay.classList.add("hidden");
+};
+
+btnSaveProfile.onclick = () => {
+  const newName = profileName.value.trim();
+  if (!newName) {
+    alert("Vui lòng nhập tên hiển thị");
+    return;
+  }
+
+  currentUser
+    .updateProfile({ displayName: newName })
+    .then(() => {
+      userInfo.textContent = "Xin chào " + newName;
+      profileOverlay.classList.add("hidden");
+    })
+    .catch((err) => alert("Lỗi: " + err.message));
 };
 
 DB.auth.onAuthStateChanged((user) => {
