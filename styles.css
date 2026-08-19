@@ -256,13 +256,11 @@ body {
   aspect-ratio: 16/9;
   border-radius: 12px;
 }
-
 @media (max-width: 600px) {
   .post-media iframe {
     aspect-ratio: 16/9; 
   }
 }
-
 .confirm-overlay {
   position: fixed;
   inset: 0;
@@ -306,17 +304,17 @@ body {
 }
 
 #userInfo {
-  background: none;
+  background: #f1f3f4;
   border: none;
   font: inherit;
   color: inherit;
-  padding: 6px 4px;
+  padding: 6px 14px;
+  border-radius: 999px;
   cursor: pointer;
-  border-radius: 8px;
 }
 
 #userInfo:hover {
-  background: #f1f3f4;
+  background: #e4e6e7;
 }
 
 .login-box input {
