@@ -22,36 +22,42 @@ btnLogout.onclick = () => {
   DB.auth.signOut();
 };
 
-userInfo.onclick = () => {
-  if (!currentUser) return;
-  profileName.value = currentUser.displayName || "";
-  profileEmail.textContent = currentUser.email || "";
-  profileOverlay.classList.remove("hidden");
-};
+if (userInfo && profileOverlay && profileName && profileEmail) {
+  userInfo.onclick = () => {
+    if (!currentUser) return;
+    profileName.value = currentUser.displayName || "";
+    profileEmail.textContent = currentUser.email || "";
+    profileOverlay.classList.remove("hidden");
+  };
 
-btnCloseProfile.onclick = () => {
-  profileOverlay.classList.add("hidden");
-};
+  profileOverlay.onclick = (e) => {
+    if (e.target === profileOverlay) profileOverlay.classList.add("hidden");
+  };
 
-profileOverlay.onclick = (e) => {
-  if (e.target === profileOverlay) profileOverlay.classList.add("hidden");
-};
-
-btnSaveProfile.onclick = () => {
-  const newName = profileName.value.trim();
-  if (!newName) {
-    alert("Vui lòng nhập tên hiển thị");
-    return;
+  if (btnCloseProfile) {
+    btnCloseProfile.onclick = () => {
+      profileOverlay.classList.add("hidden");
+    };
   }
 
-  currentUser
-    .updateProfile({ displayName: newName })
-    .then(() => {
-      userInfo.textContent = "Xin chào " + newName;
-      profileOverlay.classList.add("hidden");
-    })
-    .catch((err) => alert("Lỗi: " + err.message));
-};
+  if (btnSaveProfile) {
+    btnSaveProfile.onclick = () => {
+      const newName = profileName.value.trim();
+      if (!newName) {
+        alert("Vui lòng nhập tên hiển thị");
+        return;
+      }
+
+      currentUser
+        .updateProfile({ displayName: newName })
+        .then(() => {
+          userInfo.textContent = "Xin chào " + newName;
+          profileOverlay.classList.add("hidden");
+        })
+        .catch((err) => alert("Lỗi: " + err.message));
+    };
+  }
+}
 
 DB.auth.onAuthStateChanged((user) => {
   currentUser = user;
