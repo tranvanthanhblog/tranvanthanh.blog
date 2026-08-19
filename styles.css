@@ -257,10 +257,9 @@ body {
   border-radius: 12px;
 }
 
-
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .post-media iframe {
-    aspect-ratio: 16/9;
+    aspect-ratio: 16/9; 
   }
 }
 
@@ -304,4 +303,51 @@ body {
 
 .confirm-actions .btn {
   padding: 8px 16px;
+}
+
+#userInfo {
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  padding: 6px 4px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+#userInfo:hover {
+  background: #f1f3f4;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 12px 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.profile-email {
+  color: #666;
+  font-size: 13px;
+  margin: -4px 0 16px;
+  text-align: left;
+}
+
+.comment {
+  align-items: flex-start;
+}
+
+.comment-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-email {
+  font-size: 11px;
+  color: #999;
 }
