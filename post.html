@@ -83,14 +83,29 @@
   DB.onComments(id, (comments) => {
     commentList.innerHTML = "";
 
+    function esc(str) {
+      const d = document.createElement("div");
+      d.textContent = str ?? "";
+      return d.innerHTML;
+    }
+
     comments.forEach((c) => {
       const div = document.createElement("div");
       div.className = "comment";
 
+      const isAdminViewer = currentUser && DB.isAdmin(currentUser);
+
       div.innerHTML = `
-        <img src="${c.photo || "avatar.jpg"}">
-        <b>${c.name}</b>
-        <span>${c.text}</span>
+        <img src="${esc(c.photo || "avatar.jpg")}">
+        <div class="comment-body">
+          <b>${esc(c.name)}</b>
+          ${
+            isAdminViewer && c.email
+              ? `<div class="comment-email">${esc(c.email)}</div>`
+              : ""
+          }
+          <span>${esc(c.text)}</span>
+        </div>
         ${
           currentUser &&
           (currentUser.uid === c.uid || DB.isAdmin(currentUser))
