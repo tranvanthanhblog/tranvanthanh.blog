@@ -93,56 +93,67 @@ function loadPosts() {
     posts.forEach((post) => {
       const likeCount = post.likes ? Object.keys(post.likes).length : 0;
       const thumbUrl = post.thumb || "";
+      const isAdminViewer = currentUser && DB.isAdmin(currentUser);
 
       const div = document.createElement("div");
       div.className = "post";
 
       div.innerHTML = `
-        <div class="thumb">
+        <div class="yt-thumb">
+          ${thumbUrl ? `<img src="${esc(thumbUrl)}">` : ""}
+        </div>
+        <div class="yt-meta">
+          <div class="yt-info">
+            <h3 class="yt-title">${esc(post.title)}</h3>
+            <div class="yt-stats">${
+              post.createdAt ? timeAgo(post.createdAt) + " • " : ""
+            }❤️ ${likeCount} lượt thích</div>
+          </div>
           ${
-            thumbUrl
-              ? `<img src="${thumbUrl}">`
+            isAdminViewer
+              ? `<div class="yt-menu-wrap">
+                  <button class="yt-menu-btn">⋮</button>
+                  <div class="yt-menu hidden">
+                    <button class="yt-menu-edit">Chỉnh sửa</button>
+                    <button class="yt-menu-delete danger-text">Xóa</button>
+                  </div>
+                </div>`
               : ""
           }
-
-        </div>
-        <div class="post-info">
-          <h3>${post.title}</h3>
-          <div class="actions">
-            <button class="pill like-btn">❤️ ${likeCount}</button>
-            <button class="pill view-btn">Xem</button>
-            ${
-              currentUser && DB.isAdmin(currentUser)
-                ? `<button class="pill edit-btn">Sửa</button><button class="pill danger delete-btn">Xóa</button>`
-                : ""
-            }
-          </div>
         </div>
       `;
 
-      div.querySelector(".like-btn").onclick = () => {
-        if (!currentUser) {
-          alert("Đăng nhập để tim bài viết");
-          return;
-        }
-        DB.like(post.id, currentUser.uid);
+      const goToPost = () => {
+        location.href = "post.html?id=" + post.id;
       };
 
-      div.querySelector(".view-btn").onclick = () => {
-        localStorage.setItem("viewPost", post.id);
-        location.href = "post.html";
-      };
+      div.querySelector(".yt-thumb").onclick = goToPost;
+      div.querySelector(".yt-title").onclick = goToPost;
 
-      const edit = div.querySelector(".edit-btn");
-      if (edit) {
-        edit.onclick = () => {
+      const menuBtn = div.querySelector(".yt-menu-btn");
+      const menu = div.querySelector(".yt-menu");
+      if (menuBtn) {
+        menuBtn.onclick = (e) => {
+          e.stopPropagation();
+          document.querySelectorAll(".yt-menu").forEach((m) => {
+            if (m !== menu) m.classList.add("hidden");
+          });
+          menu.classList.toggle("hidden");
+        };
+      }
+
+      const editBtn = div.querySelector(".yt-menu-edit");
+      if (editBtn) {
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
           location.href = "admin.html?edit=" + post.id;
         };
       }
 
-      const del = div.querySelector(".delete-btn");
-      if (del) {
-        del.onclick = () => {
+      const deleteBtn = div.querySelector(".yt-menu-delete");
+      if (deleteBtn) {
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
           DB.showConfirm("Xóa bài này?").then((ok) => {
             if (ok) DB.deletePost(post.id);
           });
@@ -152,4 +163,29 @@ function loadPosts() {
       feed.appendChild(div);
     });
   });
+}
+
+document.addEventListener("click", () => {
+  document.querySelectorAll(".yt-menu").forEach((m) => m.classList.add("hidden"));
+});
+
+function esc(str) {
+  const d = document.createElement("div");
+  d.textContent = str ?? "";
+  return d.innerHTML;
+}
+
+function timeAgo(ts) {
+  const diff = Math.floor((Date.now() - ts) / 1000);
+  if (diff < 60) return "Vừa xong";
+  const mins = Math.floor(diff / 60);
+  if (mins < 60) return `${mins} phút trước`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} giờ trước`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} ngày trước`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} tháng trước`;
+  const years = Math.floor(months / 12);
+  return `${years} năm trước`;
 }
