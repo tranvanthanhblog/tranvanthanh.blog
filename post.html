@@ -15,117 +15,228 @@
     <div class="feed">
       <button onclick="history.back()" class="btn ghost">← Quay lại</button>
 
-      <h2 id="title"></h2>
-
       <div id="media" class="post-media"></div>
-      <div id="content" class="post-content"></div>
+
+      <h2 id="title"></h2>
+      <div class="post-sub" id="metaRow"></div>
+
+      <div class="post-actions">
+        <button id="btnLike" class="pill action-btn">
+          <span id="likeIcon">🤍</span> <span id="likeCount">0</span>
+        </button>
+        <button id="btnToggleComment" class="pill action-btn">
+          💬 Bình luận
+        </button>
+        <button id="btnShare" class="pill action-btn">🔗 Chia sẻ</button>
+      </div>
+
+      <div class="desc-box">
+        <div id="content" class="post-content collapsed"></div>
+        <button id="btnMore" class="more-btn hidden">Xem thêm</button>
+      </div>
     </div>
-    <div class="feed">
+
+    <div class="feed hidden" id="commentSection">
       <h3>Bình luận</h3>
 
       <div id="commentBox" class="hidden">
-       <input id="cmtInput" placeholder="Viết bình luận..." />
-       <button id="btnSend" class="btn">Gửi</button>
+        <input id="cmtInput" placeholder="Viết bình luận..." />
+        <button id="btnSend" class="btn">Gửi</button>
       </div>
       <div id="commentList"></div>
     </div>
 
-    
     <script src="db.js"></script>
 
     <script>
-      const id = localStorage.getItem("viewPost");
+      const params = new URLSearchParams(location.search);
+      const id = params.get("id");
+
+      let currentUser = null;
+      let currentPost = null;
+      let lastMediaUrl = null;
+
+      function esc(str) {
+        const d = document.createElement("div");
+        d.textContent = str ?? "";
+        return d.innerHTML;
+      }
+
+      function timeAgo(ts) {
+        const diff = Math.floor((Date.now() - ts) / 1000);
+        if (diff < 60) return "Vừa xong";
+        const mins = Math.floor(diff / 60);
+        if (mins < 60) return `${mins} phút trước`;
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return `${hours} giờ trước`;
+        const days = Math.floor(hours / 24);
+        if (days < 30) return `${days} ngày trước`;
+        const months = Math.floor(days / 30);
+        if (months < 12) return `${months} tháng trước`;
+        const years = Math.floor(months / 12);
+        return `${years} năm trước`;
+      }
 
       function renderMedia(url) {
         if (!url) return "";
         if (url.includes("drive.google.com/file/d/")) {
-         const id = url.split("/d/")[1].split("/")[0];
-         return `<iframe 
-                   src="https://drive.google.com/file/d/${id}/preview"
-                   width="100%" 
-                   height="480"
-                   allow="autoplay; fullscreen">
-                </iframe>`;
+          const fid = url.split("/d/")[1].split("/")[0];
+          return `<iframe
+                    src="https://drive.google.com/file/d/${fid}/preview"
+                    width="100%"
+                    height="480"
+                    allow="autoplay; fullscreen">
+                 </iframe>`;
         }
         if (/\.(jpg|jpeg|png|gif|webp)$/i.test(url)) {
-        return `<img src="${url}" />`;
+          return `<img src="${url}" />`;
         }
         return `<video src="${url}" controls style="width:100%"></video>`;
+      }
+
+      function renderLikeUI() {
+        if (!currentPost) return;
+        const likeCount = currentPost.likes
+          ? Object.keys(currentPost.likes).length
+          : 0;
+        const liked =
+          currentUser && currentPost.likes && currentPost.likes[currentUser.uid];
+
+        likeIcon.textContent = liked ? "❤️" : "🤍";
+        likeCount_el.textContent = likeCount;
+        btnLike.classList.toggle("liked", !!liked);
+      }
+      const likeCount_el = document.getElementById("likeCount");
+
+      if (!id) {
+        title.textContent = "Không tìm thấy bài viết";
       }
 
       DB.onPosts((posts) => {
         const post = posts.find((p) => p.id === id);
         if (!post) return;
+        currentPost = post;
 
         title.textContent = post.title;
+        metaRow.textContent = post.createdAt ? timeAgo(post.createdAt) : "";
 
-        media.innerHTML = renderMedia(post.media);
-
-        content.innerHTML = post.content.replace(/\n/g, "<br>");
-      });
-      DB.auth.onAuthStateChanged((user) => {
-    currentUser = user;
-
-    if (user) commentBox.classList.remove("hidden");
-    else commentBox.classList.add("hidden");
-  });
-
-  btnSend.onclick = () => {
-    if (!currentUser) return;
-
-    const text = cmtInput.value.trim();
-    if (!text) return;
-
-    DB.addComment(id, currentUser, text);
-    cmtInput.value = "";
-  };
-
-  DB.onComments(id, (comments) => {
-    commentList.innerHTML = "";
-
-    function esc(str) {
-      const d = document.createElement("div");
-      d.textContent = str ?? "";
-      return d.innerHTML;
-    }
-
-    comments.forEach((c) => {
-      const div = document.createElement("div");
-      div.className = "comment";
-
-      const isAdminViewer = currentUser && DB.isAdmin(currentUser);
-
-      div.innerHTML = `
-        <img src="${esc(c.photo || "avatar.jpg")}">
-        <div class="comment-body">
-          <b>${esc(c.name)}</b>
-          ${
-            isAdminViewer && c.email
-              ? `<div class="comment-email">${esc(c.email)}</div>`
-              : ""
-          }
-          <span>${esc(c.text)}</span>
-        </div>
-        ${
-          currentUser &&
-          (currentUser.uid === c.uid || DB.isAdmin(currentUser))
-            ? `<span class="del-cmt">❌</span>`
-            : ""
+        if (post.media !== lastMediaUrl) {
+          media.innerHTML = renderMedia(post.media);
+          lastMediaUrl = post.media;
         }
-      `;
 
-      const del = div.querySelector(".del-cmt");
-      if (del) {
-        del.onclick = () => {
-          DB.showConfirm("Xóa bình luận này?").then((ok) => {
-            if (ok) DB.deleteComment(id, c.id);
-          });
-        };
-      }
+        content.innerHTML = (post.content || "").replace(/\n/g, "<br>");
 
-      commentList.appendChild(div);
-    });
-  });
+        requestAnimationFrame(() => {
+          if (content.scrollHeight > content.clientHeight + 2) {
+            btnMore.classList.remove("hidden");
+          } else {
+            btnMore.classList.add("hidden");
+          }
+        });
+
+        renderLikeUI();
+      });
+
+      btnLike.onclick = () => {
+        if (!currentUser) {
+          alert("Đăng nhập để thích bài viết");
+          return;
+        }
+        DB.like(id, currentUser.uid);
+      };
+
+      btnMore.onclick = () => {
+        content.classList.toggle("collapsed");
+        btnMore.textContent = content.classList.contains("collapsed")
+          ? "Xem thêm"
+          : "Ẩn bớt";
+      };
+
+      btnToggleComment.onclick = () => {
+        commentSection.classList.toggle("hidden");
+        if (!commentSection.classList.contains("hidden")) {
+          commentSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      };
+
+      btnShare.onclick = () => {
+        const url = location.href;
+        if (navigator.share) {
+          navigator
+            .share({ title: currentPost ? currentPost.title : "", url })
+            .catch(() => {});
+          return;
+        }
+        if (navigator.clipboard) {
+          navigator.clipboard
+            .writeText(url)
+            .then(() => alert("Đã sao chép liên kết bài viết!"))
+            .catch(() => prompt("Sao chép liên kết:", url));
+        } else {
+          prompt("Sao chép liên kết:", url);
+        }
+      };
+
+      DB.auth.onAuthStateChanged((user) => {
+        currentUser = user;
+
+        if (user) commentBox.classList.remove("hidden");
+        else commentBox.classList.add("hidden");
+
+        renderLikeUI();
+      });
+
+      btnSend.onclick = () => {
+        if (!currentUser) return;
+
+        const text = cmtInput.value.trim();
+        if (!text) return;
+
+        DB.addComment(id, currentUser, text);
+        cmtInput.value = "";
+      };
+
+      DB.onComments(id, (comments) => {
+        commentList.innerHTML = "";
+
+        comments.forEach((c) => {
+          const div = document.createElement("div");
+          div.className = "comment";
+
+          const isAdminViewer = currentUser && DB.isAdmin(currentUser);
+
+          div.innerHTML = `
+            <img src="${esc(c.photo || "avatar.jpg")}">
+            <div class="comment-body">
+              <b>${esc(c.name)}</b>
+              ${
+                isAdminViewer && c.email
+                  ? `<div class="comment-email">${esc(c.email)}</div>`
+                  : ""
+              }
+              <span>${esc(c.text)}</span>
+            </div>
+            ${
+              currentUser &&
+              (currentUser.uid === c.uid || DB.isAdmin(currentUser))
+                ? `<span class="del-cmt">❌</span>`
+                : ""
+            }
+          `;
+
+          const del = div.querySelector(".del-cmt");
+          if (del) {
+            del.onclick = () => {
+              DB.showConfirm("Xóa bình luận này?").then((ok) => {
+                if (ok) DB.deleteComment(id, c.id);
+              });
+            };
+          }
+
+          commentList.appendChild(div);
+        });
+      });
     </script>
   </body>
 </html>
