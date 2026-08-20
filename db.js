@@ -16,6 +16,7 @@ const db = firebase.database();
 const ADMIN_EMAILS = [
   "tranduonglx2020@gmail.com",
   "tranvanthanhblog@gmail.com",
+  "pvinh1895@gmail.com",
 ];
 
 function isAdmin(user) {
@@ -27,6 +28,16 @@ function publish(post) {
   post.likes = {};
   post.createdAt = Date.now();
   return db.ref("posts/" + id).set(post);
+}
+
+function getPost(id, callback) {
+  db.ref("posts/" + id).once("value", (snap) => {
+    callback(snap.val());
+  });
+}
+
+function updatePost(id, data) {
+  return db.ref("posts/" + id).update(data);
 }
 
 function onPosts(callback) {
@@ -63,7 +74,7 @@ function addComment(postId, user, text) {
     uid: user.uid,
     name: user.displayName,
     email: user.email || "",
-    photo: "avatar.jpg" || "",
+    photo: user.photoURL || "avatar.jpg",
     text,
     createdAt: Date.now(),
   });
@@ -114,6 +125,8 @@ window.DB = {
   auth,
   isAdmin,
   publish,
+  getPost,
+  updatePost,
   onPosts,
   like,
   deletePost,
