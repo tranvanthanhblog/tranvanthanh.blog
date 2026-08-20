@@ -74,7 +74,7 @@ function addComment(postId, user, text) {
     uid: user.uid,
     name: user.displayName,
     email: user.email || "",
-    photo: user.photoURL || "avatar.jpg",
+    photo: "avatar.jpg" || "",
     text,
     createdAt: Date.now(),
   });
