@@ -113,7 +113,7 @@ function loadPosts() {
             <button class="pill view-btn">Xem</button>
             ${
               currentUser && DB.isAdmin(currentUser)
-                ? `<button class="pill danger delete-btn">Xóa</button>`
+                ? `<button class="pill edit-btn">Sửa</button><button class="pill danger delete-btn">Xóa</button>`
                 : ""
             }
           </div>
@@ -132,6 +132,13 @@ function loadPosts() {
         localStorage.setItem("viewPost", post.id);
         location.href = "post.html";
       };
+
+      const edit = div.querySelector(".edit-btn");
+      if (edit) {
+        edit.onclick = () => {
+          location.href = "admin.html?edit=" + post.id;
+        };
+      }
 
       const del = div.querySelector(".delete-btn");
       if (del) {
