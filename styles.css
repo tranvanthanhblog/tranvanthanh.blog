@@ -195,8 +195,102 @@ body {
 .yt-menu button.danger-text {
   color: #c00;
 }
+
+.watch-layout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.watch-main.feed {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.watch-sidebar {
+  width: 360px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .watch-layout {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .watch-sidebar {
+    width: 100%;
+  }
+}
+
+.sidebar-title {
+  font-size: 15px;
+  margin: 0 0 12px;
+}
+
+.related-card {
+  display: flex;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 0;
+  border-radius: 8px;
+}
+
+.related-card:hover {
+  background: #f8f9fa;
+}
+
+.related-thumb {
+  width: 168px;
+  height: 94px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111;
+  flex-shrink: 0;
+}
+
+.related-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.related-info {
+  min-width: 0;
+  padding: 2px 4px 2px 0;
+}
+
+.related-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0 0 4px;
+}
+
+.related-stats {
+  font-size: 12px;
+  color: #606060;
+}
+
+.related-empty {
+  font-size: 13px;
+  color: #888;
+}
+
 .post-actions {
   display: flex;
+  align-items: center;
   gap: 10px;
   margin: 14px 0;
   flex-wrap: wrap;
@@ -212,6 +306,14 @@ body {
 .action-btn.liked {
   background: #ffe5e5;
   color: #c00;
+}
+
+.view-count-inline {
+  font-size: 13px;
+  color: #606060;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .pill {
