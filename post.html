@@ -12,28 +12,36 @@
   </head>
 
   <body>
-    <div class="feed">
-      <button onclick="history.back()" class="btn ghost">← Quay lại</button>
+    <div class="watch-layout">
+      <div class="watch-main feed">
+        <button onclick="history.back()" class="btn ghost">← Quay lại</button>
 
-      <div id="media" class="post-media"></div>
+        <div id="media" class="post-media"></div>
 
-      <h2 id="title"></h2>
-      <div class="post-sub" id="metaRow"></div>
+        <h2 id="title"></h2>
+        <div class="post-sub" id="metaRow"></div>
 
-      <div class="post-actions">
-        <button id="btnLike" class="pill action-btn">
-          <span id="likeIcon">🤍</span> <span id="likeCount">0</span>
-        </button>
-        <button id="btnToggleComment" class="pill action-btn">
-          💬 Bình luận
-        </button>
-        <button id="btnShare" class="pill action-btn">🔗 Chia sẻ</button>
+        <div class="post-actions">
+          <button id="btnLike" class="pill action-btn">
+            <span id="likeIcon">🤍</span> <span id="likeCount">0</span>
+          </button>
+          <span class="view-count-inline">👁 <span id="viewCount">0</span> lượt xem</span>
+          <button id="btnToggleComment" class="pill action-btn">
+            💬 Bình luận
+          </button>
+          <button id="btnShare" class="pill action-btn">🔗 Chia sẻ</button>
+        </div>
+
+        <div class="desc-box">
+          <div id="content" class="post-content collapsed"></div>
+          <button id="btnMore" class="more-btn hidden">Xem thêm</button>
+        </div>
       </div>
 
-      <div class="desc-box">
-        <div id="content" class="post-content collapsed"></div>
-        <button id="btnMore" class="more-btn hidden">Xem thêm</button>
-      </div>
+      <aside class="watch-sidebar">
+        <h3 class="sidebar-title">Đề xuất cho bạn</h3>
+        <div id="relatedList"></div>
+      </aside>
     </div>
 
     <div class="feed hidden" id="commentSection">
@@ -55,6 +63,7 @@
       let currentUser = null;
       let currentPost = null;
       let lastMediaUrl = null;
+      let viewCounted = false;
 
       function esc(str) {
         const d = document.createElement("div");
@@ -119,6 +128,7 @@
 
         title.textContent = post.title;
         metaRow.textContent = post.createdAt ? timeAgo(post.createdAt) : "";
+        viewCount.textContent = post.views || 0;
 
         if (post.media !== lastMediaUrl) {
           media.innerHTML = renderMedia(post.media);
@@ -136,7 +146,48 @@
         });
 
         renderLikeUI();
+
+        if (!viewCounted) {
+          viewCounted = true;
+          DB.addView(id);
+        }
+
+        renderRelated(posts, id);
       });
+
+      function renderRelated(posts, currentId) {
+        const others = posts.filter((p) => p.id !== currentId).slice(0, 12);
+        relatedList.innerHTML = "";
+
+        others.forEach((p) => {
+          const likeCount = p.likes ? Object.keys(p.likes).length : 0;
+          const viewCnt = p.views || 0;
+          const thumbUrl = p.thumb || "";
+
+          const card = document.createElement("div");
+          card.className = "related-card";
+          card.innerHTML = `
+            <div class="related-thumb">
+              ${thumbUrl ? `<img src="${esc(thumbUrl)}">` : ""}
+            </div>
+            <div class="related-info">
+              <div class="related-title">${esc(p.title)}</div>
+              <div class="related-stats">👁 ${viewCnt} • ❤️ ${likeCount}${
+            p.createdAt ? " • " + timeAgo(p.createdAt) : ""
+          }</div>
+            </div>
+          `;
+          card.onclick = () => {
+            location.href = "post.html?id=" + p.id;
+          };
+          relatedList.appendChild(card);
+        });
+
+        if (!others.length) {
+          relatedList.innerHTML =
+            '<div class="related-empty">Chưa có bài viết khác</div>';
+        }
+      }
 
       btnLike.onclick = () => {
         if (!currentUser) {
