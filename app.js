@@ -92,6 +92,7 @@ function loadPosts() {
 
     posts.forEach((post) => {
       const likeCount = post.likes ? Object.keys(post.likes).length : 0;
+      const viewCount = post.views || 0;
       const thumbUrl = post.thumb || "";
       const isAdminViewer = currentUser && DB.isAdmin(currentUser);
 
@@ -107,7 +108,7 @@ function loadPosts() {
             <h3 class="yt-title">${esc(post.title)}</h3>
             <div class="yt-stats">${
               post.createdAt ? timeAgo(post.createdAt) + " • " : ""
-            }❤️ ${likeCount} lượt thích</div>
+            }👁 ${viewCount} lượt xem • ❤️ ${likeCount} lượt thích</div>
           </div>
           ${
             isAdminViewer
